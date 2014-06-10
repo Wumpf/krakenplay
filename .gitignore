@@ -24,10 +24,10 @@
 *.suo
 
 /Debug
-/serverwin/Debug
-/clientwin/Debug
+/krakenplay/Debug
+/client/Debug
 /testapplication/Debug
 /Release
-/serverwin/Release
-/clientwin/Release
+/krakenplay/Release
+/client/Release
 /testapplication/Release

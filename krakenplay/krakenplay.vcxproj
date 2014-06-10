@@ -11,11 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\shared\messages.h" />
     <ClInclude Include="krakenplay.h" />
+    <ClInclude Include="messages.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\shared\messages.cpp" />
     <ClCompile Include="krakenplay.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -49,8 +48,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\..\..\libraries\enet\include/;$(IncludePath)</IncludePath>
-    <LibraryPath>..\..\..\libraries\enet;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -1,6 +1,9 @@
 #pragma once
 
+// todo: reduce headers
 #include <cstdint>
+#include <thread>
+#include <winsock2.h>
 
 namespace Krakenplay
 {
@@ -14,15 +17,23 @@ namespace Krakenplay
 
 		/// Inits server on a given port.
 		/// If server was already initialized, existing server will be closed.
+		/// Opens a thread that will continuously try to receive message headers. 
 		/// \return true if everything is alright, false otherwise - will write error messages to cerr!
-		bool InitServer(uint16_t port = 1244568);
+		bool InitServer(uint16_t port = 12445);
 
+
+		/// 
 		void DeInitServer();
 
 	private:
 		Server() {}
 		~Server();
 
-		const size_t maxNumClients;
+		void Receive();
+
+		volatile bool serverRunning;
+
+		std::thread receiveThread;
+		SOCKET serverSocket;
 	};
 }
