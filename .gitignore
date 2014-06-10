@@ -19,3 +19,15 @@
 *.exe
 *.out
 *.app
+
+*.sdf
+*.suo
+
+/Debug
+/serverwin/Debug
+/clientwin/Debug
+/testapplication/Debug
+/Release
+/serverwin/Release
+/clientwin/Release
+/testapplication/Release
