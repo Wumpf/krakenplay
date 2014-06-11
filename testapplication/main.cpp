@@ -4,7 +4,7 @@
 int main()
 {
 	std::cout << "Init server ... ";
-	if(Krakenplay::Server::Instance().InitServer())
+	if(Krakenplay::NetworkServer::Instance().InitServer())
 		std::cout << "done\n";
 	else
 	{

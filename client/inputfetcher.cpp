@@ -1,4 +1,4 @@
-#include "inputsystem.h"
+#include "inputfetcher.h"
 
 #include <iostream>
 #include <sstream>
@@ -19,10 +19,10 @@ namespace Krakenplay
 
 #endif
 
-	const char* InputSystem::inputDeviceNames[6] = { "OISUnknown", "OISKeyboard", "OISMouse", "OISJoyStick", "OISTablet", "OISOther" };
+	const char* InputFetcher::inputDeviceNames[6] = { "OISUnknown", "OISKeyboard", "OISMouse", "OISJoyStick", "OISTablet", "OISOther" };
 
 
-	InputSystem::InputSystem()
+	InputFetcher::InputFetcher()
 	{
 		OIS::ParamList pl;
 
@@ -145,11 +145,11 @@ namespace Krakenplay
 	}
 
 
-	InputSystem::~InputSystem()
+	InputFetcher::~InputFetcher()
 	{
 	}
 
-	void InputSystem::Update(NetworkClient& client)
+	void InputFetcher::Update(NetworkClient& client)
 	{
 
 	}

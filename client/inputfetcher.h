@@ -10,12 +10,12 @@ namespace Krakenplay
 	class NetworkClient;
 
 	/// An OIS based input system.
-	class InputSystem
+	class InputFetcher
 	{
 	public:
 		/// Initializes OIS and logs status into console.
-		InputSystem();
-		~InputSystem();
+		InputFetcher();
+		~InputFetcher();
 
 		void Update(NetworkClient& client);
 
