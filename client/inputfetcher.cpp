@@ -147,6 +147,7 @@ namespace Krakenplay
 
 	InputFetcher::~InputFetcher()
 	{
+		OIS::InputManager::destroyInputSystem(inputManager);
 	}
 
 	void InputFetcher::Update(NetworkClient& client)

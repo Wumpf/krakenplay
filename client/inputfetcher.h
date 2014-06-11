@@ -20,6 +20,7 @@ namespace Krakenplay
 		void Update(NetworkClient& client);
 
 	private:
+
 		OIS::InputManager* inputManager;
 
 		static const char* inputDeviceNames[6];

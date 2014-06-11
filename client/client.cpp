@@ -4,7 +4,7 @@
 
 namespace Krakenplay
 {
-	bool Client::InitClient(uint16_t port)
+	bool NetworkClient::InitClient(uint16_t port)
 	{
 		DeInitClient();
 		this->port = port;
@@ -26,12 +26,12 @@ namespace Krakenplay
 
 		// Open thread for receiving
 		sendRunning = true;
-		sendThread = std::thread(std::bind(&Krakenplay::Client::Send, this));
+		sendThread = std::thread(std::bind(&Krakenplay::NetworkClient::Send, this));
 
 		return true;
 	}
 
-	void Client::Send()
+	void NetworkClient::Send()
 	{
 		// Prepare the sockaddr_in structure.
 		sockaddr_in serverAddr;
@@ -60,7 +60,7 @@ namespace Krakenplay
 	}
 
 
-	void Client::DeInitClient()
+	void NetworkClient::DeInitClient()
 	{
 		if(sendRunning)
 		{
@@ -71,7 +71,7 @@ namespace Krakenplay
 		}
 	}
 
-	Client::~Client()
+	NetworkClient::~NetworkClient()
 	{
 		DeInitClient();
 	}

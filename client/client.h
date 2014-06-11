@@ -7,11 +7,11 @@
 namespace Krakenplay
 {
 	/// Krakenplay client. Transmitts input to a Krakenplay-server via UDP.
-	class Client
+	class NetworkClient
 	{
 	public:
-		Client() {}
-		~Client();
+		NetworkClient() {}
+		~NetworkClient();
 
 		/// Inits client on a given port.
 		/// If client was already initialized, existing client will be closed.

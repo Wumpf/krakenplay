@@ -9,10 +9,10 @@ int main()
 	try
 	{
 		std::cout << "Init input fetching system ...";
-		Krakenplay::InputFetcher inputSystem;
+		Krakenplay::InputFetcher inputFetcher;
 
 		std::cout << "Init client ... ";
-		Krakenplay::Client client;
+		Krakenplay::NetworkClient client;
 		if (client.InitClient())
 			std::cout << "done\n";
 		else
@@ -21,9 +21,10 @@ int main()
 			return 1;
 		}
 
-
-		for (;;) {}
-
+		for (;;)
+		{
+			inputFetcher.Update(client);
+		}
 	}
 	catch(OIS::Exception exep)
 	{
