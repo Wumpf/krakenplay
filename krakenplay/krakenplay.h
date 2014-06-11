@@ -9,10 +9,10 @@ namespace Krakenplay
 {
 	/// Krakenplay server singleton class.
 	/// The server manages all connections to clients and gathers all incoming inputs.
-	class Server
+	class NetworkServer
 	{
 	public:
-		static Server& Instance();
+		static NetworkServer& Instance();
 
 
 		/// Inits server on a given port.
@@ -26,8 +26,8 @@ namespace Krakenplay
 		void DeInitServer();
 
 	private:
-		Server() {}
-		~Server();
+		NetworkServer() {}
+		~NetworkServer();
 
 		void Receive();
 

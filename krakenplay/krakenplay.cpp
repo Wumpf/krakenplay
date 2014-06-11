@@ -7,13 +7,13 @@
 
 namespace Krakenplay
 {
-	Server& Server::Instance()
+	NetworkServer& NetworkServer::Instance()
 	{
-		static Server server;
+		static NetworkServer server;
 		return server;
 	}
 
-	bool Server::InitServer(uint16_t port)
+	bool NetworkServer::InitServer(uint16_t port)
 	{	
 		DeInitServer();
 
@@ -47,12 +47,12 @@ namespace Krakenplay
 
 		// Open thread for receiving
 		serverRunning = true;
-		receiveThread = std::thread(std::bind(&Krakenplay::Server::Receive, this));
+		receiveThread = std::thread(std::bind(&Krakenplay::NetworkServer::Receive, this));
 	
 		return true;
 	}
 
-	void Server::Receive()
+	void NetworkServer::Receive()
 	{
 		while(serverRunning)
 		{
@@ -75,7 +75,7 @@ namespace Krakenplay
 		}
 	}
 
-	void Server::DeInitServer()
+	void NetworkServer::DeInitServer()
 	{
 		if(serverRunning)
 		{
@@ -86,7 +86,7 @@ namespace Krakenplay
 		}
 	}
 
-	Server::~Server()
+	NetworkServer::~NetworkServer()
 	{
 		DeInitServer();
 	}

@@ -4,17 +4,14 @@
 
 namespace Krakenplay
 {
-
-	Client& Client::Instance()
+	NetworkClient::NetworkClient()
 	{
-		static Client server;
-		return server;
+		memset(&serverAddr, 0, sizeof(serverAddr));
 	}
 
-	bool Client::InitClient(uint16_t port)
+	bool NetworkClient::InitClient()
 	{
 		DeInitClient();
-		this->port = port;
 
 		// Initialize winsock - multiple initializations are not bad, infact there is reference counting mechanism
 		// http://stackoverflow.com/questions/1869689/is-it-possible-to-tell-if-wsastartup-has-been-called-in-a-process
@@ -31,42 +28,27 @@ namespace Krakenplay
 			std::cerr << "Could not create socket: " << WSAGetLastError() << std::endl;
 		}
 
-		// Open thread for receiving
-		sendRunning = true;
-		sendThread = std::thread(std::bind(&Krakenplay::Client::Send, this));
-
 		return true;
 	}
 
-	void Client::Send()
+	void NetworkClient::SetServerAddress(const std::string& ipAdress, uint16_t port = 12445)
 	{
 		// Prepare the sockaddr_in structure.
-		sockaddr_in serverAddr;
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_port = htons(port);
-		serverAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1"); // TODO
+		serverAddr.sin_addr.S_un.S_addr = inet_addr(ipAdress.c_str());
+	}
 
-		while(sendRunning)
+	void NetworkClient::SendToServer(const void* data, unsigned int dataSize)
+	{
+		// Send message
+		if(sendto(clientSocket, reinterpret_cast<const char*>(data), dataSize, 0, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
-			// TEST CODE
-
-			// Send message
-			MessageHeader messageHeader;
-			messageHeader.messageType = 13;
-
-			if(sendto(clientSocket, reinterpret_cast<char*>(&messageHeader), sizeof(messageHeader), 0, 
-					 reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
-			{
-				if(sendRunning)
-					std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
-				continue;
-			}
-
-			Sleep(300);
+			std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
 		}
 	}
 
-	void Client::DeInitClient()
+	void NetworkClient::DeInitClient()
 	{
 		if(sendRunning)
 		{
@@ -77,7 +59,7 @@ namespace Krakenplay
 		}
 	}
 
-	Client::~Client()
+	NetworkClient::~NetworkClient()
 	{
 		DeInitClient();
 	}

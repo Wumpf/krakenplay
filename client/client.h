@@ -6,34 +6,32 @@
 
 namespace Krakenplay
 {
-	/// Krakenplay server singleton class.
-	/// The server manages all connections to clients and gathers all incoming inputs.
-	class Client
+	/// Krakenplay client. Transmits packets to a Krakenplay-server via UDP.
+	class NetworkClient
 	{
 	public:
-		static Client& Instance();
+		NetworkClient();
+		~NetworkClient();
 
 		/// Inits client on a given port.
 		/// If client was already initialized, existing client will be closed.
 		/// \return true if everything is alright, false otherwise - will write error messages to cerr!
-		bool InitClient(uint16_t port = 12445);
+		bool InitClient();
 
+		/// Setups server address which should be used in SendToServer.
+		void SetServerAddress(const std::string& ipAdress, uint16_t port = 12445);
 
-		/// 
+		/// Sends the given datablock to the (earlier configurated) server.
+		void SendToServer(const void* data, unsigned int dataSize);
+
+		/// Closes all sockets and de-initilizes the client.
 		void DeInitClient();
 
 	private:
-		Client() {}
-		~Client();
-
 		void Send();
 
-
-		std::thread sendThread;
 		SOCKET clientSocket;
-
+		sockaddr_in serverAddr;
 		uint16_t port;
-
-		volatile bool sendRunning;
 	};
 }
