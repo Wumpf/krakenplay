@@ -1,4 +1,5 @@
 #include "inputfetcher.h"
+#include "mousefetcher.h"
 
 #include <iostream>
 #include <sstream>
@@ -19,9 +20,6 @@ namespace Krakenplay
 
 #endif
 
-	const char* InputFetcher::inputDeviceNames[6] = { "OISUnknown", "OISKeyboard", "OISMouse", "OISJoyStick", "OISTablet", "OISOther" };
-
-
 	InputFetcher::InputFetcher()
 	{
 		OIS::ParamList pl;
@@ -36,7 +34,7 @@ namespace Krakenplay
 		wc.lpszClassName = L"krakenplay";
 		if(!RegisterClass(&wc))
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 window class!");
-		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 100, 100, 0, 0, wc.hInstance, NULL);
+		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 200, 10, 0, 0, wc.hInstance, NULL);
 		if(hWnd == NULL)
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 Window Dialog!");
 
@@ -131,27 +129,58 @@ namespace Krakenplay
 		unsigned int v = inputManager->getVersionNumber();
 		std::cout << "OIS Version: " << (v >> 16) << "." << ((v >> 8) & 0x000000FF) << "." << (v & 0x000000FF)
 			<< "\nRelease Name: " << inputManager->getVersionName()
-			<< "\nManager: " << inputManager->inputSystemName()
-			<< "\nTotal Keyboards: " << inputManager->getNumberOfDevices(OIS::OISKeyboard)
-			<< "\nTotal Mice: " << inputManager->getNumberOfDevices(OIS::OISMouse)
-			<< "\nTotal JoySticks: " << inputManager->getNumberOfDevices(OIS::OISJoyStick);
-
-		// Register all devices
-		OIS::DeviceList list = inputManager->listFreeDevices();
-		for(OIS::DeviceList::iterator i = list.begin(); i != list.end(); ++i)
-			std::cout << "\n\tDevice: " << inputDeviceNames[i->first] << " Vendor: " << i->second;
-		std::cout << std::endl;
-
+			<< "\nManager: " << inputManager->inputSystemName() << std::endl;
 	}
 
 
 	InputFetcher::~InputFetcher()
 	{
+		for (auto fetcher : devices)
+		{
+			delete fetcher;
+		}
+		devices.clear();
 		OIS::InputManager::destroyInputSystem(inputManager);
 	}
 
 	void InputFetcher::Update(NetworkClient& client)
 	{
+		// Add new devices if there are any.
+		AddFreeDevices();
 
+		// Caputure all devices.
+		bool immediateUpdateRequest = false;
+		for (auto fetcher : devices)
+		{
+			if (fetcher->FetchState())
+				immediateUpdateRequest = true;
+		}
+	}
+
+	void InputFetcher::AddFreeDevices()
+	{
+		// Register all new devices.
+		OIS::DeviceList list = inputManager->listFreeDevices();
+		for (OIS::DeviceList::iterator i = list.begin(); i != list.end(); ++i)
+		{
+			try
+			{
+				switch (i->first)
+				{
+				case OIS::OISMouse:
+					std::cout << "Connected Mouse. " << " Vendor: " << i->second << "\n";
+					devices.push_back(new MouseFetcher(inputManager));
+					break;
+
+				//default:
+				//	std::cout << "Unknown input device connected. " << " Vendor: " << i->second << "\n";
+				}
+			}
+			catch (OIS::Exception e)
+			{
+				std::cerr << "Failed to create input device fetcher.\n";
+				std::cerr << e.what() << std::endl;
+			}
+		}
 	}
 }

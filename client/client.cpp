@@ -24,9 +24,7 @@ namespace Krakenplay
 			std::cerr << "Could not create socket: " << WSAGetLastError() << std::endl;
 		}
 
-		// Open thread for receiving
-		sendRunning = true;
-		sendThread = std::thread(std::bind(&Krakenplay::NetworkClient::Send, this));
+		initialized = true;
 
 		return true;
 	}
@@ -39,35 +37,28 @@ namespace Krakenplay
 		serverAddr.sin_port = htons(port);
 		serverAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1"); // TODO
 
-		while(sendRunning)
+
+		// TEST CODE
+
+		// Send message
+		MessageHeader messageHeader;
+		messageHeader.messageType = 13;
+
+		if(sendto(clientSocket, reinterpret_cast<char*>(&messageHeader), sizeof(messageHeader), 0, 
+					reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
-			// TEST CODE
-
-			// Send message
-			MessageHeader messageHeader;
-			messageHeader.messageType = 13;
-
-			if(sendto(clientSocket, reinterpret_cast<char*>(&messageHeader), sizeof(messageHeader), 0, 
-					 reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
-			{
-				if(sendRunning)
-					std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
-				continue;
-			}
-
-			Sleep(300);
+			std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
 		}
 	}
 
 
 	void NetworkClient::DeInitClient()
 	{
-		if(sendRunning)
+		if (initialized)
 		{
-			sendRunning = false;
 			closesocket(clientSocket);
 			WSACleanup();
-			sendThread.join();
+			initialized = false;
 		}
 	}
 

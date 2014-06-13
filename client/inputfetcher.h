@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace OIS
 {
 	class InputManager;
@@ -8,6 +10,7 @@ namespace OIS
 namespace Krakenplay
 {
 	class NetworkClient;
+	class InputFetchDevice;
 
 	/// An OIS based input system.
 	class InputFetcher
@@ -21,9 +24,10 @@ namespace Krakenplay
 
 	private:
 
+		/// Checks for free devices and adds them.
+		void AddFreeDevices();
+
 		OIS::InputManager* inputManager;
-
-		static const char* inputDeviceNames[6];
+		std::vector<InputFetchDevice*> devices;
 	};
-
 }

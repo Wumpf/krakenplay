@@ -85,10 +85,13 @@
     <ClCompile Include="client.cpp" />
     <ClCompile Include="inputfetcher.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mousefetcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h" />
+    <ClInclude Include="inputfetchdevice.h" />
     <ClInclude Include="inputfetcher.h" />
+    <ClInclude Include="mousefetcher.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

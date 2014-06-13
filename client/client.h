@@ -10,7 +10,7 @@ namespace Krakenplay
 	class NetworkClient
 	{
 	public:
-		NetworkClient() {}
+		NetworkClient() : initialized(false) {}
 		~NetworkClient();
 
 		/// Inits client on a given port.
@@ -24,12 +24,9 @@ namespace Krakenplay
 	private:
 		void Send();
 
-
-		std::thread sendThread;
 		SOCKET clientSocket;
 
 		uint16_t port;
-
-		volatile bool sendRunning;
+		bool initialized;
 	};
 }
