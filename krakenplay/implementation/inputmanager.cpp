@@ -29,7 +29,7 @@ namespace Krakenplay
 		{
 			auto mouseInfoSlot = GetMouseInfoSlot(clientIndex, header.deviceIndex);
 			mouseInfoSlot->connected = true;
-			mouseInfoSlot->lastUpdate = ezTime::Now();
+			mouseInfoSlot->lastUpdate = Time::Now();
 			memcpy(&mouseInfoSlot->state, messageBody, messageBodySize);
 			break;
 		}
@@ -38,7 +38,7 @@ namespace Krakenplay
 		{
 			auto mouseInfoSlot = GetMouseInfoSlot(clientIndex, header.deviceIndex);
 			mouseInfoSlot->connected = false;
-			mouseInfoSlot->lastUpdate = ezTime::Now();
+			mouseInfoSlot->lastUpdate = Time::Now();
 			break;
 		}
 

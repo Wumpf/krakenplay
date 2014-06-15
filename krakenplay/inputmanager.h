@@ -4,7 +4,7 @@
 #include <mutex>
 #include <vector>
 
-#include "Time/Time.h"
+#include "Time/time.h"
 
 namespace Krakenplay
 {
@@ -36,7 +36,7 @@ namespace Krakenplay
 			bool connected;
 
 			/// Timestamp of the last received update
-			ezTime lastUpdate;
+			Time lastUpdate;
 		};
 
 		struct MouseInfo : public DeviceInfo

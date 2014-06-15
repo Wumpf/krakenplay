@@ -14,19 +14,19 @@
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="messages.h" />
     <ClInclude Include="networkserver.h" />
-    <ClInclude Include="Time\Implementation\OSX\Time_osx.h" />
-    <ClInclude Include="Time\Implementation\Posix\Time_posix.h" />
-    <ClInclude Include="Time\Implementation\Time_inl.h" />
-    <ClInclude Include="Time\Implementation\Win\Time_win.h" />
-    <ClInclude Include="Time\Stopwatch.h" />
-    <ClInclude Include="Time\Time.h" />
+    <ClInclude Include="time\Implementation\time_inl.h" />
+    <ClInclude Include="time\Implementation\time_osx.h" />
+    <ClInclude Include="time\Implementation\time_posix.h" />
+    <ClInclude Include="time\Implementation\time_win.h" />
+    <ClInclude Include="time\stopwatch.h" />
+    <ClInclude Include="time\time.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="implementation\inputmanager.cpp" />
     <ClCompile Include="implementation\messages.cpp" />
     <ClCompile Include="implementation\networkserver.cpp" />
-    <ClCompile Include="Time\Implementation\Stopwatch.cpp" />
-    <ClCompile Include="Time\Implementation\Time.cpp" />
+    <ClCompile Include="time\Implementation\stopwatch.cpp" />
+    <ClCompile Include="time\Implementation\time.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F3861328-FD61-4D11-9FD5-CD80F045CB0F}</ProjectGuid>

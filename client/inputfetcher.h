@@ -30,7 +30,7 @@ namespace Krakenplay
 		/// Checks for free devices and adds them.
 		void AddFreeDevices();
 
-		ezStopwatch timeSinceLastUpdatePackage;
+		Stopwatch timeSinceLastUpdatePackage;
 
 		OIS::InputManager* inputManager;
 		std::vector<InputFetchDevice*> devices;

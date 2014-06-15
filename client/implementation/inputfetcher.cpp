@@ -2,7 +2,7 @@
 #include "../mousefetcher.h"
 #include "../networkclient.h"
 
-#include "../../krakenplay/Time/Time.h"
+#include "../../krakenplay/Time/time.h"
 
 #include <iostream>
 #include <sstream>
