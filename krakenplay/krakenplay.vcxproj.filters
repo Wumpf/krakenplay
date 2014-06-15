@@ -51,4 +51,9 @@
       <UniqueIdentifier>{b9b80651-7c79-418b-8b6d-69423a0ad1c9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="implementation\inputmanager.inl">
+      <Filter>implementation</Filter>
+    </None>
+  </ItemGroup>
 </Project>

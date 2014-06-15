@@ -1,6 +1,6 @@
 #include "../inputmanager.h"
 #include <assert.h>
-
+#include <iostream>
 namespace Krakenplay
 {
 	InputManager& InputManager::Instance()
@@ -9,11 +9,50 @@ namespace Krakenplay
 		return server;
 	}
 
+	InputManager::InputManager()
+	{
+		SetConnectionTimeout();
+	}
+
+	InputManager::~InputManager()
+	{
+	}
+
 	void InputManager::Update()
 	{
-		receiveInputMutex.lock();
-		// TODO
-		receiveInputMutex.unlock();
+		inputWriteMutex.lock();
+
+		// Check device connection timeouts.
+		Time now = Time::Now(); // Time::Now can be costly, so do it only once per update.
+		writeState.numConnectedMouses = 0;
+		for (MouseInfo& info : writeState.mouseStates)
+		{
+			info.connected = info.connected && (now - info.lastUpdate < deviceConnectionTimeout);
+			if (info.connected)
+				++writeState.numConnectedMouses;
+		}
+
+		// Copy write state to read state.
+		readState = writeState;
+
+		inputWriteMutex.unlock();
+	}
+
+	const InputManager::MouseInfo* InputManager::GetMouseState(unsigned int globalDeviceID) const
+	{
+		if (globalDeviceID >= readState.mouseStates.size())
+			return nullptr;
+		return &readState.mouseStates[globalDeviceID];
+	}
+
+	const InputManager::MouseInfo* InputManager::GetMouseState(unsigned int clientID, uint8_t clientDeviceID) const
+	{
+		for (const MouseInfo& mouseInfo : readState.mouseStates)
+		{
+			if (mouseInfo.clientID == clientID && mouseInfo.clientDeviceIndex == clientID)
+				return &mouseInfo;
+		}
+		return nullptr;
 	}
 
 	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientIndex)
@@ -21,13 +60,13 @@ namespace Krakenplay
 		assert(messageBody != nullptr || (messageBody == nullptr && messageBodySize == 0) && "Invalid message body pointer!");
 		assert(messageBodySize != 0 && GetMessageBodySize(header.messageType) == messageBodySize && "Invalid message body size!");
 
-		receiveInputMutex.lock();
+		inputWriteMutex.lock();
 
 		switch (header.messageType)
 		{
 		case MessageChunkType::MOUSE_STATUS:
 		{
-			auto mouseInfoSlot = GetMouseInfoSlot(clientIndex, header.deviceIndex);
+			auto mouseInfoSlot = writeState.GetMouseInfoSlot(clientIndex, header.deviceIndex);
 			mouseInfoSlot->connected = true;
 			mouseInfoSlot->lastUpdate = Time::Now();
 			memcpy(&mouseInfoSlot->state, messageBody, messageBodySize);
@@ -36,7 +75,7 @@ namespace Krakenplay
 
 		case MessageChunkType::MOUSE_DISCONNECT:
 		{
-			auto mouseInfoSlot = GetMouseInfoSlot(clientIndex, header.deviceIndex);
+			auto mouseInfoSlot = writeState.GetMouseInfoSlot(clientIndex, header.deviceIndex);
 			mouseInfoSlot->connected = false;
 			mouseInfoSlot->lastUpdate = Time::Now();
 			break;
@@ -46,15 +85,15 @@ namespace Krakenplay
 			break;
 		}
 
-		receiveInputMutex.unlock();
+		inputWriteMutex.unlock();
 	}
 
-	std::vector<InputManager::MouseInfo>::iterator InputManager::GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex)
+	std::vector<InputManager::MouseInfo>::iterator InputManager::InputState::GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex)
 	{
 		auto disconnectedSlot = mouseStates.end();
 		for (auto it = mouseStates.begin(); it != mouseStates.end(); ++it)
 		{
-			if (it->clientIndex == clientIndex && it->clientDeviceIndex == clientIndex)
+			if (it->clientID == clientIndex && it->clientDeviceIndex == clientIndex)
 				return it;
 			if (it->connected == false)
 				disconnectedSlot = it;
@@ -66,7 +105,7 @@ namespace Krakenplay
 			disconnectedSlot = mouseStates.end() - 1;
 		}
 
-		disconnectedSlot->clientIndex = clientIndex;
+		disconnectedSlot->clientID = clientIndex;
 		disconnectedSlot->clientDeviceIndex = clientDeviceIndex;
 
 		return disconnectedSlot;

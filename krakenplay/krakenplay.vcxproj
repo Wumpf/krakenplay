@@ -28,6 +28,9 @@
     <ClCompile Include="time\Implementation\stopwatch.cpp" />
     <ClCompile Include="time\Implementation\time.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="implementation\inputmanager.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F3861328-FD61-4D11-9FD5-CD80F045CB0F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

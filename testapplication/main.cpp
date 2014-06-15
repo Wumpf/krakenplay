@@ -1,4 +1,5 @@
 #include "../krakenplay/networkserver.h"
+#include "../krakenplay/inputmanager.h"
 #include <iostream>
 
 int main()
@@ -13,9 +14,23 @@ int main()
 	}
 
 
+	Krakenplay::InputManager::MouseInfo lastMouseState;
 	for(;;)
 	{
+		Krakenplay::InputManager::Instance().Update();
 
+		const Krakenplay::InputManager::MouseInfo* mouseInfo = Krakenplay::InputManager::Instance().GetMouseState(0);
+		if (mouseInfo)
+		{
+			if (mouseInfo->IsButtonDown(Krakenplay::StateObjects::MouseButton::Left) != lastMouseState.IsButtonDown(Krakenplay::StateObjects::MouseButton::Left))
+				std::cout << "Left click state changed\n";
+			if (mouseInfo->IsButtonDown(Krakenplay::StateObjects::MouseButton::Middle) != lastMouseState.IsButtonDown(Krakenplay::StateObjects::MouseButton::Middle))
+				std::cout << "Middle click state changed\n";
+
+			lastMouseState = *mouseInfo;
+		}
+
+		Sleep(10);
 	}
 
 
