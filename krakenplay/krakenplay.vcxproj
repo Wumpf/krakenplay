@@ -11,11 +11,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inputmanager.h" />
     <ClInclude Include="krakenplay.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="Time\Implementation\OSX\Time_osx.h" />
+    <ClInclude Include="Time\Implementation\Posix\Time_posix.h" />
+    <ClInclude Include="Time\Implementation\Time_inl.h" />
+    <ClInclude Include="Time\Implementation\Win\Time_win.h" />
+    <ClInclude Include="Time\Stopwatch.h" />
+    <ClInclude Include="Time\Time.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="krakenplay.cpp" />
+    <ClCompile Include="messages.cpp" />
+    <ClCompile Include="Time\Implementation\Stopwatch.cpp" />
+    <ClCompile Include="Time\Implementation\Time.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F3861328-FD61-4D11-9FD5-CD80F045CB0F}</ProjectGuid>

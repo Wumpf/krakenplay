@@ -3,8 +3,52 @@
   <ItemGroup>
     <ClInclude Include="krakenplay.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="Time\Stopwatch.h">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Time.h">
+      <Filter>Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Implementation\Time_inl.h">
+      <Filter>Time\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Implementation\Win\Time_win.h">
+      <Filter>Time\Implementation\Win</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Implementation\Posix\Time_posix.h">
+      <Filter>Time\Implementation\Posix</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\Implementation\OSX\Time_osx.h">
+      <Filter>Time\Implementation\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="inputmanager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="krakenplay.cpp" />
+    <ClCompile Include="Time\Implementation\Stopwatch.cpp">
+      <Filter>Time\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\Implementation\Time.cpp">
+      <Filter>Time\Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="messages.cpp" />
+    <ClCompile Include="inputmanager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Time">
+      <UniqueIdentifier>{2c0b4805-fcc7-4c73-91e6-0abb281cc20c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time\Implementation">
+      <UniqueIdentifier>{b9b80651-7c79-418b-8b6d-69423a0ad1c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time\Implementation\Win">
+      <UniqueIdentifier>{3c89956e-3219-4cde-a7ac-30b544c4727f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time\Implementation\Posix">
+      <UniqueIdentifier>{90a1c1b9-5144-4fa4-bcd8-2674e261db41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Time\Implementation\OSX">
+      <UniqueIdentifier>{c14e89a5-d437-4462-9f6f-949ac3074c34}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

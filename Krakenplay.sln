@@ -11,6 +11,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "krakenplay", "krakenplay\krakenplay.vcxproj", "{F3861328-FD61-4D11-9FD5-CD80F045CB0F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client\client.vcxproj", "{152159EC-9570-47B8-91BB-1BCB8B829488}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F3861328-FD61-4D11-9FD5-CD80F045CB0F} = {F3861328-FD61-4D11-9FD5-CD80F045CB0F}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

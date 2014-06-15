@@ -1,9 +1,9 @@
 #include "krakenplay.h"
 #include "messages.h"
-
+#include "inputmanager.h"
 
 #include <iostream>
-
+#include <cassert>
 
 namespace Krakenplay
 {
@@ -54,24 +54,46 @@ namespace Krakenplay
 
 	void NetworkServer::Receive()
 	{
+		char messageBuffer[g_maxMessageSize];
+
+		sockaddr_in socketadressHeader;
+
 		while(serverRunning)
 		{
-			// Receive header
-			MessageHeader messageHeader;
-
-			sockaddr_in socketadressHeader;
-			int socketadressHeaderLen = sizeof(socketadressHeader);
-			int recv_len = 0;
-			if((recv_len = recvfrom(serverSocket, reinterpret_cast<char*>(&messageHeader), sizeof(MessageHeader), 0,
-				reinterpret_cast<sockaddr*>(&socketadressHeader), &socketadressHeaderLen)) == SOCKET_ERROR)
+			// Receive data
+			int socketadressHeaderLen = sizeof(sockaddr_in);
+			int recvLen = 0;
+			if ((recvLen = recvfrom(serverSocket, messageBuffer, g_maxMessageSize, 0, reinterpret_cast<sockaddr*>(&socketadressHeader), &socketadressHeaderLen)) == SOCKET_ERROR)
 			{
-				if(serverRunning)
+				if (serverRunning)
 					std::cerr << "recvfrom() failed with error code: " << WSAGetLastError() << std::endl;
 				continue;
 			}
 
-			// (DEBUG) print details of the client/peer and the data received
-			std::cout << "Received packet from " << inet_ntoa(socketadressHeader.sin_addr) << ":" << ntohs(socketadressHeader.sin_port);
+			// Check if client is already known and add to list if not.
+			std::string ipString = inet_ntoa(socketadressHeader.sin_addr);
+			auto clientIter = std::find(knownClients.begin(), knownClients.end(), ipString);
+			if (clientIter == knownClients.end())
+			{
+				knownClients.push_back(ipString);
+				clientIter = knownClients.end() - 1;
+			}
+			unsigned int clientIndex = clientIter - knownClients.begin();
+
+			// Preparse message into its chunks.
+			int readPos = 0;
+			while (readPos < recvLen)
+			{
+				// Read headers
+				const MessageChunkHeader* header = reinterpret_cast<MessageChunkHeader*>(&messageBuffer[readPos]);
+				readPos += sizeof(MessageChunkHeader);
+				unsigned int messageBodySize = GetMessageBodySize(header->messageType);
+
+				// Pass to input manager.
+				InputManager::Instance().ReceiveInput(*header, &messageBuffer[readPos], messageBodySize, clientIndex);
+				readPos += messageBodySize;
+			}
+			assert(readPos == recvLen && "Received message was smaller than expected!");
 		}
 	}
 

@@ -4,7 +4,14 @@
 
 namespace Krakenplay
 {
-	bool NetworkClient::InitClient(uint16_t port)
+	NetworkClient::NetworkClient() :
+		initialized(false)
+	{
+		// Server address to default
+		SetServerAddress();
+	}
+
+	bool NetworkClient::InitClient()
 	{
 		DeInitClient();
 		this->port = port;
@@ -29,23 +36,16 @@ namespace Krakenplay
 		return true;
 	}
 
-	void NetworkClient::Send()
+	void NetworkClient::SetServerAddress(const char* ip, uint16_t port)
 	{
-		// Prepare the sockaddr_in structure.
-		sockaddr_in serverAddr;
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_port = htons(port);
-		serverAddr.sin_addr.S_un.S_addr = inet_addr("127.0.0.1"); // TODO
+		serverAddr.sin_addr.S_un.S_addr = inet_addr(ip);
+	}
 
-
-		// TEST CODE
-
-		// Send message
-		MessageHeader messageHeader;
-		messageHeader.messageType = 13;
-
-		if(sendto(clientSocket, reinterpret_cast<char*>(&messageHeader), sizeof(messageHeader), 0, 
-					reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
+	void NetworkClient::Send(char* data, unsigned int size)
+	{
+		if (sendto(clientSocket, data, size, 0, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
 			std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
 		}

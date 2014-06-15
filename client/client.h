@@ -10,21 +10,29 @@ namespace Krakenplay
 	class NetworkClient
 	{
 	public:
-		NetworkClient() : initialized(false) {}
+		NetworkClient();
 		~NetworkClient();
 
 		/// Inits client on a given port.
 		/// If client was already initialized, existing client will be closed.
 		/// \return true if everything is alright, false otherwise - will write error messages to cerr!
-		bool InitClient(uint16_t port = 12445);
+		/// \see DeInitClient
+		bool InitClient();
 
-		/// 
+		/// Destroys the client.
+		/// \see InitClient
 		void DeInitClient();
 
-	private:
-		void Send();
+		/// Sets the server address used in Send.
+		void SetServerAddress(const char* ip = "127.0.0.1", uint16_t port = 12445);
 
+		/// Sends a message to the currently configured server.
+		/// \see SetServerAddress
+		void Send(char* data, unsigned int size);
+
+	private:
 		SOCKET clientSocket;
+		sockaddr_in serverAddr;
 
 		uint16_t port;
 		bool initialized;

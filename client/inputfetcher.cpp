@@ -1,15 +1,19 @@
 #include "inputfetcher.h"
 #include "mousefetcher.h"
+#include "client.h"
+
+#include "../krakenplay/Time/Time.h"
 
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 #include <OISInputManager.h>
 #include <OISException.h>
 
+
 namespace Krakenplay
 {
-
 #if defined OIS_WIN32_PLATFORM
 #include <windows.h>
 
@@ -22,8 +26,8 @@ namespace Krakenplay
 
 	InputFetcher::InputFetcher()
 	{
+		// Init OIS
 		OIS::ParamList pl;
-
 #if defined OIS_WIN32_PLATFORM
 		// Need to create a capture window for input grabbing.
 		MSG msg = { 0 };
@@ -34,7 +38,7 @@ namespace Krakenplay
 		wc.lpszClassName = L"krakenplay";
 		if(!RegisterClass(&wc))
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 window class!");
-		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 200, 10, 0, 0, wc.hInstance, NULL);
+		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 100, 100, 0, 0, wc.hInstance, NULL);
 		if(hWnd == NULL)
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 Window Dialog!");
 
@@ -148,13 +152,53 @@ namespace Krakenplay
 		// Add new devices if there are any.
 		AddFreeDevices();
 
-		// Caputure all devices.
+		// Capture all devices.
 		bool immediateUpdateRequest = false;
 		for (auto fetcher : devices)
 		{
 			if (fetcher->FetchState())
 				immediateUpdateRequest = true;
 		}
+
+		// Sleep until we are ready to send a message.
+		int sleepTimeMS = 0;
+		if (immediateUpdateRequest)
+			sleepTimeMS = static_cast<int>(Krakenplay::g_minDurationBetweenMessage_ms - timeSinceLastUpdatePackage.GetRunningTotal().GetMilliseconds());
+		else
+			sleepTimeMS = static_cast<int>(Krakenplay::g_maxDurationBetweenMessage_ms - timeSinceLastUpdatePackage.GetRunningTotal().GetMilliseconds());
+		if (sleepTimeMS > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMS));
+
+		// Combine messages until buffer is full.
+		unsigned int messageBufferPos = 0;
+		for (auto fetcher : devices)
+		{
+			unsigned int stateInfoSize = 0;
+			const void* stateInfo = fetcher->GetState(stateInfoSize);
+
+			// Buffer full?
+			if (messageBufferPos + stateInfoSize + sizeof(Krakenplay::MessageChunkHeader) >= g_maxMessageSize)
+			{
+				// send message
+				client.Send(messageBuffer, messageBufferPos);
+				messageBufferPos = 0;
+			}
+
+			// Add message Header.
+			memcpy(&messageBuffer[messageBufferPos], fetcher->GetStateMessageHeader(), sizeof(Krakenplay::MessageChunkHeader));
+			messageBufferPos += sizeof(Krakenplay::MessageChunkHeader);
+
+			// Add status message itself.
+			memcpy(&messageBuffer[messageBufferPos], stateInfo, stateInfoSize);
+			messageBufferPos += stateInfoSize;
+		}
+
+		// Send message.
+		client.Send(messageBuffer, messageBufferPos);
+
+		// Restart stopwatch.
+		timeSinceLastUpdatePackage.StopAndReset();
+		timeSinceLastUpdatePackage.Resume();
 	}
 
 	void InputFetcher::AddFreeDevices()

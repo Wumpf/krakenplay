@@ -6,34 +6,65 @@
 
 namespace Krakenplay
 {
+// No padding
+#pragma pack(push)
+#pragma pack(1)
+
 	/// Specifies the different types of available network messages.
-	enum class MessageType : uint8_t
+	enum class MessageChunkType : uint8_t
 	{
 		MOUSE_DISCONNECT,
 		MOUSE_STATUS
 	};
 
-	/// All regular Krakenplay network messages begin with this header.
-	struct MessageHeader
+	/// Header for a message chunk. A single network message can consist of multiple message chunks.
+	/// After it follows either a message body with GetMessageBodySize bytes length.
+	struct MessageChunkHeader
 	{
-		uint8_t messageType;
+		MessageChunkType messageType;
+		uint8_t deviceIndex; ///< Most messages are about devices - this is the client-local device index.
 	};
+
+	/// Returns the size of the message body for the given type.
+	unsigned int GetMessageBodySize(MessageChunkType bodyType);
 
 	/// Structures describing the state of an input device.
 	namespace StateObjects
 	{
-		/// Mouse button bit mask definition.
+		/// Mouse button bit mask definition. Compatible to OIS::MouseButtonID
 		enum class MouseButton : uint8_t
 		{
-			
+			Left = SET_BIT(0),
+			Right = SET_BIT(1),
+			Middle = SET_BIT(2),
+			Button3 = SET_BIT(3),
+			Button4 = SET_BIT(4),
+			Button5 = SET_BIT(5),
+			Button6 = SET_BIT(6),
+			Button7 = SET_BIT(7)
 		};
 
 		/// Mouse state object. Part of MessageType::MOUSE_STATUS
 		struct MouseState
 		{
+			int32_t positionX;
+			int32_t positionY;
+			int32_t mouseWheel;
 			MouseButton buttonState;
 		};
 	}
+
+#pragma pack(pop)
+
+	/// Maximum expected number of milliseconds between two status messages.
+	extern const double g_maxDurationBetweenMessage_ms;
+	/// Minimum expected number of milliseconds between two status messages.
+	/// If an input event demands immediate update it will still be delayed by this timestep.
+	extern const double g_minDurationBetweenMessage_ms;
+
+	/// A single network message never exceeds this size in bytes.
+	/// This gives a limitation to the number of messages that can be chained together.
+	const unsigned int g_maxMessageSize = 2048;
 }
 
 #undef SET_BIT
