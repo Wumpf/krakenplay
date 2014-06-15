@@ -1,5 +1,5 @@
-#include "client.h"
-#include "../krakenplay/messages.h"
+#include "../networkclient.h"
+#include "../../krakenplay/messages.h"
 #include <iostream>
 
 namespace Krakenplay

@@ -1,6 +1,6 @@
-#include "krakenplay.h"
-#include "messages.h"
-#include "inputmanager.h"
+#include "../networkserver.h"
+#include "../messages.h"
+#include "../inputmanager.h"
 
 #include <iostream>
 #include <cassert>

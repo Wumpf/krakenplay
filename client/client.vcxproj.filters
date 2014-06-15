@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="inputfetchdevice.h" />
+    <ClInclude Include="inputfetcher.h" />
+    <ClInclude Include="mousefetcher.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="implementation">
+      <UniqueIdentifier>{02f331f5-3ee0-4fb5-ba84-ed5c2f5b7e11}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="implementation\networkclient.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\inputfetcher.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\mousefetcher.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

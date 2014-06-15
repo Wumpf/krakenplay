@@ -1,4 +1,4 @@
-#include "inputmanager.h"
+#include "../inputmanager.h"
 #include <assert.h>
 
 namespace Krakenplay

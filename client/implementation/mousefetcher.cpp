@@ -1,4 +1,4 @@
-#include "mousefetcher.h"
+#include "../mousefetcher.h"
 #include <OISInputManager.h>
 #include <cassert>
 #include <iostream>

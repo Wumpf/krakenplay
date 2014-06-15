@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="krakenplay.h" />
     <ClInclude Include="messages.h" />
     <ClInclude Include="Time\Stopwatch.h">
       <Filter>Time</Filter>
@@ -22,17 +21,24 @@
       <Filter>Time\Implementation\OSX</Filter>
     </ClInclude>
     <ClInclude Include="inputmanager.h" />
+    <ClInclude Include="networkserver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="krakenplay.cpp" />
     <ClCompile Include="Time\Implementation\Stopwatch.cpp">
       <Filter>Time\Implementation</Filter>
     </ClCompile>
     <ClCompile Include="Time\Implementation\Time.cpp">
       <Filter>Time\Implementation</Filter>
     </ClCompile>
-    <ClCompile Include="messages.cpp" />
-    <ClCompile Include="inputmanager.cpp" />
+    <ClCompile Include="implementation\inputmanager.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\messages.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\networkserver.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Time">
@@ -49,6 +55,9 @@
     </Filter>
     <Filter Include="Time\Implementation\OSX">
       <UniqueIdentifier>{c14e89a5-d437-4462-9f6f-949ac3074c34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="implementation">
+      <UniqueIdentifier>{5d4607c4-ec9d-469e-95a2-be87ac237aa7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

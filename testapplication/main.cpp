@@ -1,4 +1,4 @@
-#include "../krakenplay/krakenplay.h"
+#include "../krakenplay/networkserver.h"
 #include <iostream>
 
 int main()

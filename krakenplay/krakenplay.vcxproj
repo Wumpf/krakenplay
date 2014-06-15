@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inputmanager.h" />
-    <ClInclude Include="krakenplay.h" />
     <ClInclude Include="messages.h" />
+    <ClInclude Include="networkserver.h" />
     <ClInclude Include="Time\Implementation\OSX\Time_osx.h" />
     <ClInclude Include="Time\Implementation\Posix\Time_posix.h" />
     <ClInclude Include="Time\Implementation\Time_inl.h" />
@@ -22,9 +22,9 @@
     <ClInclude Include="Time\Time.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="inputmanager.cpp" />
-    <ClCompile Include="krakenplay.cpp" />
-    <ClCompile Include="messages.cpp" />
+    <ClCompile Include="implementation\inputmanager.cpp" />
+    <ClCompile Include="implementation\messages.cpp" />
+    <ClCompile Include="implementation\networkserver.cpp" />
     <ClCompile Include="Time\Implementation\Stopwatch.cpp" />
     <ClCompile Include="Time\Implementation\Time.cpp" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "client.h"
+#include "networkclient.h"
 #include "inputfetcher.h"
 #include <OISException.h>
 

@@ -82,16 +82,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="client.cpp" />
-    <ClCompile Include="inputfetcher.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="mousefetcher.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="client.h" />
     <ClInclude Include="inputfetchdevice.h" />
     <ClInclude Include="inputfetcher.h" />
     <ClInclude Include="mousefetcher.h" />
+    <ClInclude Include="networkclient.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="implementation\inputfetcher.cpp" />
+    <ClCompile Include="implementation\mousefetcher.cpp" />
+    <ClCompile Include="implementation\networkclient.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

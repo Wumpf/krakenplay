@@ -1,8 +1,8 @@
-#include "inputfetcher.h"
-#include "mousefetcher.h"
-#include "client.h"
+#include "../inputfetcher.h"
+#include "../mousefetcher.h"
+#include "../networkclient.h"
 
-#include "../krakenplay/Time/Time.h"
+#include "../../krakenplay/Time/Time.h"
 
 #include <iostream>
 #include <sstream>
