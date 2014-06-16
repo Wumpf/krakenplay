@@ -5,6 +5,15 @@ namespace Krakenplay
 		return (static_cast<uint8_t>(state.buttonState) & static_cast<uint8_t>(button)) > 0;
 	}
 
+	inline bool InputManager::MouseInfo::WasButtonPressed(StateObjects::MouseButton button) const
+	{
+		return IsButtonDown(button) && !GetOldState().IsButtonDown(button);
+	}
+	inline bool InputManager::MouseInfo::WasButtonReleased(StateObjects::MouseButton button) const
+	{
+		return !IsButtonDown(button) && GetOldState().IsButtonDown(button);
+	}
+
 	inline unsigned int InputManager::GetNumMouses() const
 	{
 		return readState.mouseStates.size();
@@ -19,5 +28,4 @@ namespace Krakenplay
 	{
 		this->deviceConnectionTimeout = deviceConnectionTimeout;
 	}
-
 }

@@ -25,7 +25,7 @@ namespace Krakenplay
 			unsigned int clientID;
 			
 			/// Local index of this device on the client machine.
-			uint8_t clientDeviceIndex;
+			uint8_t clientDeviceID;
 
 			/// True if there were no disconnect message or the timeout was not exceeded.
 			/// Disconnected devices will be replaced if a new device comes in.
@@ -41,7 +41,19 @@ namespace Krakenplay
 			/// Checks if the given mouse button is currently down.
 			bool IsButtonDown(StateObjects::MouseButton button) const;
 
+			/// Checks if the given mouse button changed from not-down to down in the last update.
+			bool WasButtonPressed(StateObjects::MouseButton button) const;
+
+			/// Checks if the given mouse button changed from down to not-down in the last update.
+			bool WasButtonReleased(StateObjects::MouseButton button) const;
+
+			/// Current mouse state data.
 			StateObjects::MouseState state;
+
+		private:
+			/// Returns the old read state of this object.
+			/// \attention Works only if this is the current read state!
+			const InputManager::MouseInfo& GetOldState() const;
 		};
 		
 
@@ -83,6 +95,8 @@ namespace Krakenplay
 		InputManager();
 		~InputManager();
 
+		friend struct MouseInfo;
+
 		/// assembly of all input states that need to be double buffered.
 		struct InputState
 		{
@@ -96,8 +110,9 @@ namespace Krakenplay
 			std::vector<MouseInfo>::iterator GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex);
 		};
 
-		InputState readState;	///< State from which is currently read.
-		InputState writeState;	///< State to which is written in parallel.
+		InputState readState;		///< State from which is currently read.
+		InputState oldReadState;	///< Read state before, used for axis deltas and button events (was pressed/was released)
+		InputState writeState;		///< State to which is written in parallel.
 
 		std::mutex inputWriteMutex;
 

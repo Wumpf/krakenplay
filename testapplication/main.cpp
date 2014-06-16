@@ -1,11 +1,24 @@
 #include "../krakenplay/networkserver.h"
 #include "../krakenplay/inputmanager.h"
 #include <iostream>
+#include <string>
+
+using namespace Krakenplay;
+
+// Names for all possible mouse buttons.
+static const char* mouseButtonNames[static_cast<unsigned>(StateObjects::MouseButton::NUM_BUTTONS)] =
+	{ "left", "right", "middle", "button3", "button4", "button5", "button6", "button7" };
+
+// Returns a string for displaying deviceID and clientDeviceID
+std::string GetDeviceIdentifyString(const InputManager::DeviceInfo& deviceInfo)
+{
+	return "(clientID " + std::to_string(deviceInfo.clientID) + " | devID " + std::to_string(deviceInfo.clientDeviceID) + ") ";
+}
 
 int main()
 {
 	std::cout << "Init server ... ";
-	if(Krakenplay::NetworkServer::Instance().InitServer())
+	if(NetworkServer::Instance().InitServer())
 		std::cout << "done\n";
 	else
 	{
@@ -14,20 +27,23 @@ int main()
 	}
 
 
-	Krakenplay::InputManager::MouseInfo lastMouseState;
 	for(;;)
 	{
-		Krakenplay::InputManager::Instance().Update();
+		InputManager::Instance().Update();
 
-		const Krakenplay::InputManager::MouseInfo* mouseInfo = Krakenplay::InputManager::Instance().GetMouseState(0);
-		if (mouseInfo)
+		// All mouse buttons
+		for (unsigned int mouseIdx = 0; mouseIdx < InputManager::Instance().GetNumMouses(); ++mouseIdx)
 		{
-			if (mouseInfo->IsButtonDown(Krakenplay::StateObjects::MouseButton::Left) != lastMouseState.IsButtonDown(Krakenplay::StateObjects::MouseButton::Left))
-				std::cout << "Left click state changed\n";
-			if (mouseInfo->IsButtonDown(Krakenplay::StateObjects::MouseButton::Middle) != lastMouseState.IsButtonDown(Krakenplay::StateObjects::MouseButton::Middle))
-				std::cout << "Middle click state changed\n";
+			for (unsigned int mouseButtonIdx = 0; mouseButtonIdx < static_cast<unsigned>(StateObjects::MouseButton::NUM_BUTTONS); ++mouseButtonIdx)
+			{
+				StateObjects::MouseButton mouseButton = static_cast<StateObjects::MouseButton>(1 << mouseButtonIdx);
+				auto mouseState = InputManager::Instance().GetMouseState(mouseIdx);
 
-			lastMouseState = *mouseInfo;
+				if (mouseState->WasButtonPressed(mouseButton))
+					std::cout << GetDeviceIdentifyString(*mouseState) << "Mouse button " << mouseButtonNames[mouseButtonIdx] << " was pressed!\n";
+				if (mouseState->WasButtonReleased(mouseButton))
+					std::cout << GetDeviceIdentifyString(*mouseState) << "Mouse button " << mouseButtonNames[mouseButtonIdx] << " was released!\n";
+			}
 		}
 
 		Sleep(10);
@@ -35,4 +51,4 @@ int main()
 
 
 	return 0;
-}	
+}

@@ -20,6 +20,8 @@ namespace Krakenplay
 
 	void InputManager::Update()
 	{
+		oldReadState = readState;
+
 		inputWriteMutex.lock();
 
 		// Check device connection timeouts.
@@ -36,6 +38,13 @@ namespace Krakenplay
 		readState = writeState;
 
 		inputWriteMutex.unlock();
+
+		// If oldReadState does not have as many states as writeState, read errors occur.
+		for (unsigned int i = oldReadState.mouseStates.size(); i < readState.mouseStates.size(); ++i)
+		{
+			oldReadState.mouseStates.push_back(readState.mouseStates[i]);
+			oldReadState.mouseStates.back().connected = false;
+		}
 	}
 
 	const InputManager::MouseInfo* InputManager::GetMouseState(unsigned int globalDeviceID) const
@@ -49,10 +58,21 @@ namespace Krakenplay
 	{
 		for (const MouseInfo& mouseInfo : readState.mouseStates)
 		{
-			if (mouseInfo.clientID == clientID && mouseInfo.clientDeviceIndex == clientID)
+			if (mouseInfo.clientID == clientID && mouseInfo.clientDeviceID == clientID)
 				return &mouseInfo;
 		}
 		return nullptr;
+	}
+
+	const InputManager::MouseInfo& InputManager::MouseInfo::GetOldState() const
+	{
+		assert(InputManager::Instance().GetMouseState(clientID, clientDeviceID) == this && "GetOldState can only be called on the current readState");
+		auto& ownMouseState = InputManager::Instance().readState.mouseStates;
+	
+		size_t ownIndex = static_cast<size_t>(&ownMouseState.front() - this);
+		assert(InputManager::Instance().oldReadState.mouseStates.size() > ownIndex && "Old read state has not as many elements as new read state");
+
+		return InputManager::Instance().oldReadState.mouseStates[ownIndex];
 	}
 
 	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientIndex)
@@ -93,7 +113,7 @@ namespace Krakenplay
 		auto disconnectedSlot = mouseStates.end();
 		for (auto it = mouseStates.begin(); it != mouseStates.end(); ++it)
 		{
-			if (it->clientID == clientIndex && it->clientDeviceIndex == clientIndex)
+			if (it->clientID == clientIndex && it->clientDeviceID == clientIndex)
 				return it;
 			if (it->connected == false)
 				disconnectedSlot = it;
@@ -106,7 +126,7 @@ namespace Krakenplay
 		}
 
 		disconnectedSlot->clientID = clientIndex;
-		disconnectedSlot->clientDeviceIndex = clientDeviceIndex;
+		disconnectedSlot->clientDeviceID = clientDeviceIndex;
 
 		return disconnectedSlot;
 	}

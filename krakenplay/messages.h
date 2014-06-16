@@ -34,14 +34,16 @@ namespace Krakenplay
 		/// Mouse button bit mask definition. Compatible to OIS::MouseButtonID
 		enum class MouseButton : uint8_t
 		{
-			Left = SET_BIT(0),
-			Right = SET_BIT(1),
-			Middle = SET_BIT(2),
-			Button3 = SET_BIT(3),
-			Button4 = SET_BIT(4),
-			Button5 = SET_BIT(5),
-			Button6 = SET_BIT(6),
-			Button7 = SET_BIT(7)
+			LEFT = SET_BIT(0),
+			RIGHT = SET_BIT(1),
+			MIDDLE = SET_BIT(2),
+			BUTTON3 = SET_BIT(3),
+			BUTTON4 = SET_BIT(4),
+			BUTTON5 = SET_BIT(5),
+			BUTTON6 = SET_BIT(6),
+			BUTTON7 = SET_BIT(7),
+
+			NUM_BUTTONS = 8
 		};
 
 		/// Mouse state object. Part of MessageType::MOUSE_STATUS
