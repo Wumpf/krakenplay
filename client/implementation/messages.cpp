@@ -20,7 +20,7 @@ namespace Krakenplay
 			break;
 
 		case Krakenplay::MessageChunkType::MOUSE_STATUS:
-			return sizeof(StateObjects::MouseState);
+			return sizeof(StateObjects::InternalMouseState);
 			break;
 
 		default:

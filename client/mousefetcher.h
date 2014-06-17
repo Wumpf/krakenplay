@@ -36,6 +36,6 @@ namespace Krakenplay
 		OIS::Mouse* inputObject;
 
 		MessageChunkHeader stateMessageHeader;
-		StateObjects::MouseState currentState;
+		InternalMouseState currentState;
 	};
 }

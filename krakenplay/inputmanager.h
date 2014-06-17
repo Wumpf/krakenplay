@@ -1,10 +1,11 @@
 #pragma once
 
 #include "messages.h"
+#include "Time/time.h"
+
 #include <mutex>
 #include <vector>
-
-#include "Time/time.h"
+#include <cassert>
 
 namespace Krakenplay
 {
@@ -19,8 +20,16 @@ namespace Krakenplay
 		void Update();
 		
 		/// Device info, contained in all concrete device infos.
-		struct DeviceInfo
+		template<typename ChildClass>
+		class DeviceState
 		{
+		public:
+			/// Checks if the given device changed from connected to disconnected in the last update.
+			bool WasDisconnected() const;
+
+			/// Checks if the given device disconnected to connected in the last update.
+			bool WasConnected() const;
+		
 			/// Index of the client computer this device belongs to.
 			unsigned int clientID;
 			
@@ -33,44 +42,47 @@ namespace Krakenplay
 
 			/// Timestamp of the last received update
 			Time lastUpdate;
+
+		protected:
+			/// Returns the old read state of this object.
+			/// \attention Works only if this is the current read state!
+			const ChildClass& GetOldState() const;
 		};
 
 		/// Device info for mouses.
-		struct MouseInfo : public DeviceInfo
+		class MouseState : public DeviceState<MouseState>
 		{
+		public:
 			/// Checks if the given mouse button is currently down.
-			bool IsButtonDown(StateObjects::MouseButton button) const;
+			bool IsButtonDown(MouseButton button) const;
 
 			/// Checks if the given mouse button changed from not-down to down in the last update.
-			bool WasButtonPressed(StateObjects::MouseButton button) const;
+			bool WasButtonPressed(MouseButton button) const;
 
 			/// Checks if the given mouse button changed from down to not-down in the last update.
-			bool WasButtonReleased(StateObjects::MouseButton button) const;
+			bool WasButtonReleased(MouseButton button) const;
+
 
 			/// Current mouse state data.
-			StateObjects::MouseState state;
-
-		private:
-			/// Returns the old read state of this object.
-			/// \attention Works only if this is the current read state!
-			const InputManager::MouseInfo& GetOldState() const;
+			InternalMouseState state;
 		};
-		
 
-		/// Returns the current mouse state by providing a global device ID.
+
+		/// Returns the current device state of a given type by providing a global device ID.
 		///
 		/// If there is no mouse state with the given ID, nullptr will be returned. 
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
 		/// \attention Be careful if you store a pointer/references to this state, since after an InputManager::Update call it may be relocated!
-		const MouseInfo* GetMouseState(unsigned int globalDeviceID) const;
+		template<typename StateType>
+		const StateType* GetState(unsigned int globalDeviceID) const;
 
-		/// Returns the current mouse state by providing a client ID and a client device ID.
+		/// Returns the current device state of a given type by providing a client ID and a client device ID.
 		///
 		/// If there is no mouse state with the given IDs, nullptr will be returned. 
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
 		/// \attention Be careful if you store a pointer/references to this state, since after an InputManager::Update call it may be relocated!
-		const MouseInfo* GetMouseState(unsigned int clientID, uint8_t clientDeviceID) const;
-
+		template<typename StateType>
+		const StateType* GetState(unsigned int clientID, uint8_t clientDeviceID) const;
 
 		/// Returns the number of known mouse devices.
 		/// May contain also disconnected devices.
@@ -95,19 +107,27 @@ namespace Krakenplay
 		InputManager();
 		~InputManager();
 
-		friend struct MouseInfo;
+		friend class MouseState;
 
 		/// assembly of all input states that need to be double buffered.
 		struct InputState
 		{
 			InputState() : numConnectedMouses(0) {}
 
-			std::vector<MouseInfo> mouseStates;
+			std::vector<MouseState> mouseStates;
 			unsigned int numConnectedMouses;
 
 			/// Retrieves either the mouse info with the given indices or returns a new/reused slot.
 			/// For the latter the indices will registered onto the given device slot. Connection state and last update will *not* be changed.
-			std::vector<MouseInfo>::iterator GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex);
+			std::vector<MouseState>::iterator GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex);
+
+
+			/// Gets device state list of a given type.
+			template<typename DeviceType>
+			const std::vector<DeviceType>& GetDeviceStates() const;
+
+			/// Gets mouse device states.
+			template<> const std::vector<MouseState>& GetDeviceStates<MouseState>() const;
 		};
 
 		InputState readState;		///< State from which is currently read.

@@ -28,33 +28,29 @@ namespace Krakenplay
 	/// Returns the size of the message body for the given type.
 	unsigned int GetMessageBodySize(MessageChunkType bodyType);
 
-	/// Structures describing the state of an input device.
-	namespace StateObjects
+	/// Mouse button bit mask definition. Compatible to OIS::MouseButtonID
+	enum class MouseButton : uint8_t
 	{
-		/// Mouse button bit mask definition. Compatible to OIS::MouseButtonID
-		enum class MouseButton : uint8_t
-		{
-			LEFT = SET_BIT(0),
-			RIGHT = SET_BIT(1),
-			MIDDLE = SET_BIT(2),
-			BUTTON3 = SET_BIT(3),
-			BUTTON4 = SET_BIT(4),
-			BUTTON5 = SET_BIT(5),
-			BUTTON6 = SET_BIT(6),
-			BUTTON7 = SET_BIT(7),
+		LEFT = SET_BIT(0),
+		RIGHT = SET_BIT(1),
+		MIDDLE = SET_BIT(2),
+		BUTTON3 = SET_BIT(3),
+		BUTTON4 = SET_BIT(4),
+		BUTTON5 = SET_BIT(5),
+		BUTTON6 = SET_BIT(6),
+		BUTTON7 = SET_BIT(7),
 
-			NUM_BUTTONS = 8
-		};
+		NUM_BUTTONS = 8
+	};
 
-		/// Mouse state object. Part of MessageType::MOUSE_STATUS
-		struct MouseState
-		{
-			int32_t positionX;
-			int32_t positionY;
-			int32_t mouseWheel;
-			MouseButton buttonState;
-		};
-	}
+	/// Mouse state object. Body of MessageType::MOUSE_STATUS.
+	struct InternalMouseState
+	{
+		int32_t positionX;
+		int32_t positionY;
+		int32_t mouseWheel;
+		MouseButton buttonState;
+	};
 
 #pragma pack(pop)
 
