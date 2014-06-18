@@ -16,9 +16,9 @@ namespace Krakenplay
 	inline const ChildClass& InputManager::DeviceState<ChildClass>::GetCorrespondingOldState() const
 	{
 		assert(InputManager::Instance().GetState<ChildClass>(clientID, clientDeviceID) == this && "GetOldState can only be called on the current readState");
-		auto& ownState = InputManager::Instance().readState.GetDeviceStates<ChildClass>();
+		const auto& ownState = InputManager::Instance().readState.GetDeviceStates<ChildClass>();
 
-		size_t ownIndex = static_cast<size_t>(&ownState.front() - reinterpret_cast<const ChildClass*>(this));
+		size_t ownIndex = static_cast<size_t>(reinterpret_cast<const ChildClass*>(this) - &ownState.front());
 		assert(InputManager::Instance().oldReadState.GetDeviceStates<ChildClass>().size() > ownIndex && "Old read state has not as many elements as new read state");
 
 		return InputManager::Instance().oldReadState.GetDeviceStates<ChildClass>()[ownIndex];
@@ -51,7 +51,7 @@ namespace Krakenplay
 	{
 		for(const StateType& state : readState.GetDeviceStates<StateType>())
 		{
-			if(state.clientID == clientID && state.clientDeviceID == clientID)
+			if(state.clientID == clientID && state.clientDeviceID == clientDeviceID)
 				return &state;
 		}
 		return nullptr;
@@ -78,7 +78,7 @@ namespace Krakenplay
 		auto disconnectedSlot = GetDeviceStates<DeviceType>().end();
 		for(auto it = GetDeviceStates<DeviceType>().begin(); it != GetDeviceStates<DeviceType>().end(); ++it)
 		{
-			if(it->clientID == clientID && it->clientDeviceID == clientID)
+			if(it->clientID == clientID && it->clientDeviceID == clientDeviceIndex)
 				return *it;
 			if(it->connected == false)
 				disconnectedSlot = it;

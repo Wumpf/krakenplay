@@ -67,7 +67,7 @@ namespace Krakenplay
 		{
 		case MessageChunkType::MOUSE_STATUS:
 		{
-			auto mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			MouseState& mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
 			mouseInfoSlot.connected = true;
 			mouseInfoSlot.lastUpdate = Time::Now();
 			memcpy(&mouseInfoSlot.state, messageBody, messageBodySize);
@@ -76,7 +76,7 @@ namespace Krakenplay
 
 		case MessageChunkType::MOUSE_DISCONNECT:
 		{
-			auto mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			MouseState& mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
 			mouseInfoSlot.connected = false;
 			mouseInfoSlot.lastUpdate = Time::Now();
 			break;
