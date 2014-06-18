@@ -5,8 +5,8 @@ namespace Krakenplay
 {
 	InputManager& InputManager::Instance()
 	{
-		static InputManager server;
-		return server;
+		static InputManager oneAndOnly;
+		return oneAndOnly;
 	}
 
 	InputManager::InputManager()
@@ -39,15 +39,24 @@ namespace Krakenplay
 
 		inputWriteMutex.unlock();
 
-		// If oldReadState does not have as many states as writeState, read errors occur.
-		for (unsigned int i = oldReadState.mouseStates.size(); i < readState.mouseStates.size(); ++i)
+		// For state that switched from disconnected to connected, reset state to current state to avoid wrong state changes.
+		for(unsigned int i = 0; i < readState.mouseStates.size(); ++i)
 		{
-			oldReadState.mouseStates.push_back(readState.mouseStates[i]);
-			oldReadState.mouseStates.back().connected = false;
+			if(oldReadState.mouseStates.size() <= i)
+				oldReadState.mouseStates.push_back(readState.mouseStates[i]);
+
+			if(readState.mouseStates[i].WasConnected())
+			{
+				// Not as many old-read states? Create one.
+				assert(oldReadState.mouseStates[i].clientDeviceID == readState.mouseStates[i].clientDeviceID &&
+						oldReadState.mouseStates[i].clientID == readState.mouseStates[i].clientID && "Inconsistent IDs across new and old read state!");
+				oldReadState.mouseStates[i] = readState.mouseStates[i];
+				oldReadState.mouseStates[i].connected = false;
+			}
 		}
 	}
 
-	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientIndex)
+	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientID)
 	{
 		assert(messageBody != nullptr || (messageBody == nullptr && messageBodySize == 0) && "Invalid message body pointer!");
 		assert(messageBodySize != 0 && GetMessageBodySize(header.messageType) == messageBodySize && "Invalid message body size!");
@@ -58,48 +67,26 @@ namespace Krakenplay
 		{
 		case MessageChunkType::MOUSE_STATUS:
 		{
-			auto mouseInfoSlot = writeState.GetMouseInfoSlot(clientIndex, header.deviceIndex);
-			mouseInfoSlot->connected = true;
-			mouseInfoSlot->lastUpdate = Time::Now();
-			memcpy(&mouseInfoSlot->state, messageBody, messageBodySize);
+			auto mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			mouseInfoSlot.connected = true;
+			mouseInfoSlot.lastUpdate = Time::Now();
+			memcpy(&mouseInfoSlot.state, messageBody, messageBodySize);
 			break;
 		}
 
 		case MessageChunkType::MOUSE_DISCONNECT:
 		{
-			auto mouseInfoSlot = writeState.GetMouseInfoSlot(clientIndex, header.deviceIndex);
-			mouseInfoSlot->connected = false;
-			mouseInfoSlot->lastUpdate = Time::Now();
+			auto mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			mouseInfoSlot.connected = false;
+			mouseInfoSlot.lastUpdate = Time::Now();
 			break;
 		}
 
 		default:
+			assert(false && "Unknown MessageChunkType!");
 			break;
 		}
 
 		inputWriteMutex.unlock();
-	}
-
-	std::vector<InputManager::MouseState>::iterator InputManager::InputState::GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex)
-	{
-		auto disconnectedSlot = mouseStates.end();
-		for (auto it = mouseStates.begin(); it != mouseStates.end(); ++it)
-		{
-			if (it->clientID == clientIndex && it->clientDeviceID == clientIndex)
-				return it;
-			if (it->connected == false)
-				disconnectedSlot = it;
-		}
-
-		if (disconnectedSlot == mouseStates.end())
-		{
-			mouseStates.emplace_back();
-			disconnectedSlot = mouseStates.end() - 1;
-		}
-
-		disconnectedSlot->clientID = clientIndex;
-		disconnectedSlot->clientDeviceID = clientDeviceIndex;
-
-		return disconnectedSlot;
 	}
 }

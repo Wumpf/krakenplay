@@ -85,7 +85,7 @@ namespace Krakenplay
 			while (readPos < recvLen)
 			{
 				// Read headers
-				const MessageChunkHeader* header = reinterpret_cast<MessageChunkHeader*>(&messageBuffer[readPos]);
+				MessageChunkHeader* header = reinterpret_cast<MessageChunkHeader*>(&messageBuffer[readPos]);
 				readPos += sizeof(MessageChunkHeader);
 				unsigned int messageBodySize = GetMessageBodySize(header->messageType);
 

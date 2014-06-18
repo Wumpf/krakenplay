@@ -4,6 +4,7 @@
     <ClInclude Include="inputfetchdevice.h" />
     <ClInclude Include="inputfetcher.h" />
     <ClInclude Include="mousefetcher.h" />
+    <ClInclude Include="networkclient.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="implementation">

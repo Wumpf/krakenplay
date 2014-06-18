@@ -4,7 +4,7 @@
 #include "inputfetcher.h"
 #include <OISException.h>
 
-int main()
+int main(int argc, char** argv)
 {
 	try
 	{
@@ -13,6 +13,7 @@ int main()
 
 		std::cout << "Init client ... ";
 		Krakenplay::NetworkClient client;
+
 		if (client.InitClient())
 			std::cout << "done\n";
 		else
@@ -21,9 +22,13 @@ int main()
 			return 1;
 		}
 
+		if(argc > 1)
+			client.SetServerAddress(argv[1]);
+
 		for (;;)
 		{
 			inputFetcher.Update(client);
+			Sleep(200);
 		}
 	}
 	catch(OIS::Exception exep)
@@ -34,7 +39,7 @@ int main()
 	}
 	catch (...)
 	{
-		std::cerr << "Unkown exception occured" << std::endl;
+		std::cerr << "Unknown exception occurred" << std::endl;
 		return 1;
 	}
 }

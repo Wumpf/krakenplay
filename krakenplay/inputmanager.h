@@ -30,8 +30,11 @@ namespace Krakenplay
 			/// Checks if the given device disconnected to connected in the last update.
 			bool WasConnected() const;
 		
+			/// Timestamp of the last received update.
+			Time lastUpdate;
+
 			/// Index of the client computer this device belongs to.
-			unsigned int clientID;
+			uint16_t clientID;
 			
 			/// Local index of this device on the client machine.
 			uint8_t clientDeviceID;
@@ -40,13 +43,10 @@ namespace Krakenplay
 			/// Disconnected devices will be replaced if a new device comes in.
 			bool connected;
 
-			/// Timestamp of the last received update
-			Time lastUpdate;
-
 		protected:
 			/// Returns the old read state of this object.
 			/// \attention Works only if this is the current read state!
-			const ChildClass& GetOldState() const;
+			const ChildClass& GetCorrespondingOldState() const;
 		};
 
 		/// Device info for mouses.
@@ -61,7 +61,6 @@ namespace Krakenplay
 
 			/// Checks if the given mouse button changed from down to not-down in the last update.
 			bool WasButtonReleased(MouseButton button) const;
-
 
 			/// Current mouse state data.
 			InternalMouseState state;
@@ -82,7 +81,7 @@ namespace Krakenplay
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
 		/// \attention Be careful if you store a pointer/references to this state, since after an InputManager::Update call it may be relocated!
 		template<typename StateType>
-		const StateType* GetState(unsigned int clientID, uint8_t clientDeviceID) const;
+		const StateType* GetState(uint16_t clientID, uint8_t clientDeviceID) const;
 
 		/// Returns the number of known mouse devices.
 		/// May contain also disconnected devices.
@@ -99,9 +98,9 @@ namespace Krakenplay
 		/// that will cause the device to be marked disconnected immediately.
 		void SetConnectionTimeout(Time deviceConnectionTimeout = Time::Seconds(1.0f));
 
-		/// Receives an input message. This method is threadsafe.
+		/// Receives an input message. This method is thread-safe.
 		/// Krakenplay::NetworkServer uses this method in its receive thread.
-		void ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientIndex);
+		void ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientID);
 
 	private:
 		InputManager();
@@ -109,7 +108,7 @@ namespace Krakenplay
 
 		friend class MouseState;
 
-		/// assembly of all input states that need to be double buffered.
+		/// Assembly of all input states that need to be double buffered.
 		struct InputState
 		{
 			InputState() : numConnectedMouses(0) {}
@@ -119,15 +118,18 @@ namespace Krakenplay
 
 			/// Retrieves either the mouse info with the given indices or returns a new/reused slot.
 			/// For the latter the indices will registered onto the given device slot. Connection state and last update will *not* be changed.
-			std::vector<MouseState>::iterator GetMouseInfoSlot(unsigned int clientIndex, uint8_t clientDeviceIndex);
-
+			template<typename DeviceType>
+			DeviceType& GetInfoSlot(uint16_t clientID, uint8_t clientDeviceIndex);
 
 			/// Gets device state list of a given type.
 			template<typename DeviceType>
 			const std::vector<DeviceType>& GetDeviceStates() const;
+			template<typename DeviceType>
+			std::vector<DeviceType>& GetDeviceStates();
 
 			/// Gets mouse device states.
 			template<> const std::vector<MouseState>& GetDeviceStates<MouseState>() const;
+			template<> std::vector<MouseState>& GetDeviceStates<MouseState>();
 		};
 
 		InputState readState;		///< State from which is currently read.

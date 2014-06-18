@@ -14,7 +14,9 @@ namespace Krakenplay
 	enum class MessageChunkType : uint8_t
 	{
 		MOUSE_DISCONNECT,
-		MOUSE_STATUS
+		MOUSE_STATUS,
+
+		NUM_MESSAGES
 	};
 
 	/// Header for a message chunk. A single network message can consist of multiple message chunks.
@@ -46,6 +48,8 @@ namespace Krakenplay
 	/// Mouse state object. Body of MessageType::MOUSE_STATUS.
 	struct InternalMouseState
 	{
+		InternalMouseState() : positionX(0), positionY(0), mouseWheel(0), buttonState(static_cast<MouseButton>(0)) {}
+
 		int32_t positionX;
 		int32_t positionY;
 		int32_t mouseWheel;
