@@ -45,6 +45,7 @@ namespace Krakenplay
 
 	void NetworkClient::Send(char* data, unsigned int size)
 	{
+		ConvertEndiannessHostToNetwork(data, size);
 		if (sendto(clientSocket, data, size, 0, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
 			std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;

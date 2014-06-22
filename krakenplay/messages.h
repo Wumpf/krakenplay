@@ -58,6 +58,12 @@ namespace Krakenplay
 
 #pragma pack(pop)
 
+	/// Converts the endianess of a given message data block (multiple messages, each beginning with MessageChunkHeader) from host to network.
+	void ConvertEndiannessHostToNetwork(char* messageBlock, unsigned int blockSize);
+
+	/// Converts the endianess of a given message data block (multiple messages, each beginning with MessageChunkHeader) from network to host.
+	void ConvertEndiannessNetworkToHost(char* messageBlock, unsigned int blockSize);
+
 	/// Maximum expected number of milliseconds between two status messages.
 	extern const double g_maxDurationBetweenMessage_ms;
 	/// Minimum expected number of milliseconds between two status messages.

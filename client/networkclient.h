@@ -27,6 +27,7 @@ namespace Krakenplay
 		void SetServerAddress(const char* ip = "127.0.0.1", uint16_t port = 12445);
 
 		/// Sends a message to the currently configured server.
+		/// \attention Will convert the incoming data to network endianess.
 		/// \see SetServerAddress
 		void Send(char* data, unsigned int size);
 

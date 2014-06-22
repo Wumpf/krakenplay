@@ -80,6 +80,9 @@ namespace Krakenplay
 			}
 			unsigned int clientIndex = clientIter - knownClients.begin();
 
+			// Resolve endianess.
+			ConvertEndiannessNetworkToHost(messageBuffer, recvLen);
+
 			// Preparse message into its chunks.
 			int readPos = 0;
 			while (readPos < recvLen)

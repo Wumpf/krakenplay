@@ -30,29 +30,91 @@ namespace Krakenplay
 			break;
 		}
 	}
-	/*
-	void MessageChunkHeader::ConvertFromNetworkToHostByteOrder()
+
+	template<bool hostToNetwork, typename DataType>
+	void ConvertEndianess(DataType& data);
+
+	template<> void ConvertEndianess<true, uint32_t>(uint32_t& data)
 	{
-		// only uint8, nothing to do!
+		data = htonl(data);
+	}
+	template<> void ConvertEndianess<false, uint32_t>(uint32_t& data)
+	{
+		data = ntohl(data);
+	}
+	template<> void ConvertEndianess<true, int32_t>(int32_t& data)
+	{
+		*reinterpret_cast<uint32_t*>(&data) = htonl(*reinterpret_cast<uint32_t*>(&data));
+	}
+	template<> void ConvertEndianess<false, int32_t>(int32_t& data)
+	{
+		*reinterpret_cast<uint32_t*>(&data) = ntohl(*reinterpret_cast<uint32_t*>(&data));
 	}
 
-	void MessageChunkHeader::ConvertFromHostToNetworkByteOrder()
+	template<> void ConvertEndianess<true, uint16_t>(uint16_t& data)
 	{
-		// only uint8, nothing to do!
+		data = htons(data);
+	}
+	template<> void ConvertEndianess<false, uint16_t>(uint16_t& data)
+	{
+		data = ntohs(data);
+	}
+	template<> void ConvertEndianess<true, int16_t>(int16_t& data)
+	{
+		*reinterpret_cast<uint32_t*>(&data) = htons(*reinterpret_cast<uint32_t*>(&data));
+	}
+	template<> void ConvertEndianess<false, int16_t>(int16_t& data)
+	{
+		*reinterpret_cast<uint16_t*>(&data) = ntohs(*reinterpret_cast<uint16_t*>(&data));
 	}
 
-	void InternalMouseState::ConvertFromNetworkToHostByteOrder()
+	template<> void ConvertEndianess<true, float>(float& data)
 	{
-		*reinterpret_cast<uint32_t*>(positionX) = ntohl(*reinterpret_cast<uint32_t*>(positionX));
-		*reinterpret_cast<uint32_t*>(positionY) = ntohl(*reinterpret_cast<uint32_t*>(positionY));
-		*reinterpret_cast<uint32_t*>(mouseWheel) = ntohl(*reinterpret_cast<uint32_t*>(mouseWheel));
+		*reinterpret_cast<unsigned int*>(&data) = htonf(data);
+	}
+	template<> void ConvertEndianess<false, float>(float& data)
+	{
+		data = ntohf(*reinterpret_cast<unsigned int*>(&data));
 	}
 
-	void InternalMouseState::ConvertFromHostToNetworkByteOrder()
+	template<bool hostToNetwork>
+	void ConvertEndianessPackageData(char* messageBlock, unsigned int blockSize)
 	{
-		*reinterpret_cast<uint32_t*>(positionX) = htonl(*reinterpret_cast<uint32_t*>(positionX));
-		*reinterpret_cast<uint32_t*>(positionY) = htonl(*reinterpret_cast<uint32_t*>(positionY));
-		*reinterpret_cast<uint32_t*>(mouseWheel) = htonl(*reinterpret_cast<uint32_t*>(mouseWheel));
+		unsigned int readPos = 0;
+		while(readPos < blockSize)
+		{
+			// Read header - consists only of 8bit blocks that need no byte reordering!
+			MessageChunkHeader* header = reinterpret_cast<MessageChunkHeader*>(&messageBlock[readPos]);
+			readPos += sizeof(MessageChunkHeader);
+			unsigned int messageBodySize = GetMessageBodySize(header->messageType);
+
+			// Pass to input manager.
+			switch(header->messageType)
+			{
+			case MessageChunkType::MOUSE_DISCONNECT:
+				break;
+			case MessageChunkType::MOUSE_STATUS:
+			{
+				InternalMouseState* internalMouseState = reinterpret_cast<InternalMouseState*>(&messageBlock[readPos]);
+				ConvertEndianess<hostToNetwork>(internalMouseState->mouseWheel);
+				ConvertEndianess<hostToNetwork>(internalMouseState->positionX);
+				ConvertEndianess<hostToNetwork>(internalMouseState->positionY);
+				break;
+			}
+
+			default:
+				assert(false && "Unknown network message type for endianess conversion!");
+			}
+			readPos += messageBodySize;
+		}
 	}
-	*/
+
+	void ConvertEndiannessHostToNetwork(char* messageBlock, unsigned int blockSize)
+	{
+		ConvertEndianessPackageData<true>(messageBlock, blockSize);
+	}
+	void ConvertEndiannessNetworkToHost(char* messageBlock, unsigned int blockSize)
+	{
+		ConvertEndianessPackageData<false>(messageBlock, blockSize);
+	}
 }
