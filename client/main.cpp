@@ -28,7 +28,6 @@ int main(int argc, char** argv)
 		for (;;)
 		{
 			inputFetcher.Update(client);
-			Sleep(200);
 		}
 	}
 	catch(OIS::Exception exep)

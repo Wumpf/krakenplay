@@ -43,11 +43,13 @@ namespace Krakenplay
 		for(unsigned int i = 0; i < readState.mouseStates.size(); ++i)
 		{
 			if(oldReadState.mouseStates.size() <= i)
-				oldReadState.mouseStates.push_back(readState.mouseStates[i]);
-
-			if(readState.mouseStates[i].WasConnected())
 			{
-				// Not as many old-read states? Create one.
+				oldReadState.mouseStates.push_back(readState.mouseStates[i]);
+				oldReadState.mouseStates.back().connected = false;
+			}
+
+			else if(readState.mouseStates[i].WasConnected())
+			{
 				assert(oldReadState.mouseStates[i].clientDeviceID == readState.mouseStates[i].clientDeviceID &&
 						oldReadState.mouseStates[i].clientID == readState.mouseStates[i].clientID && "Inconsistent IDs across new and old read state!");
 				oldReadState.mouseStates[i] = readState.mouseStates[i];
