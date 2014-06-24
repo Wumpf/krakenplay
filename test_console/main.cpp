@@ -53,8 +53,6 @@ int main()
 					std::cout << GetDeviceIdentifyString(*mouseState) << "Mouse button " << mouseButtonNames[mouseButtonIdx] << " was released!\n";
 			}
 		}
-
-		Sleep(10);
 	}
 
 

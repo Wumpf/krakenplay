@@ -22,6 +22,7 @@
 
 *.sdf
 *.suo
+*.user
 
 /Debug
 /Release
@@ -30,5 +31,7 @@
 /client/Release
 /test_console/Debug
 /test_console/Release
+/test_sfml/Debug
+/test_sfml/Release
 /krakenplay/Release
 /*.opensdf
