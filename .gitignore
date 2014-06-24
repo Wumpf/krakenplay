@@ -24,11 +24,11 @@
 *.suo
 
 /Debug
+/Release
 /krakenplay/Debug
 /client/Debug
-/testapplication/Debug
-/Release
-/krakenplay/Release
 /client/Release
-/testapplication/Release
+/test_console/Debug
+/test_console/Release
+/krakenplay/Release
 /*.opensdf
