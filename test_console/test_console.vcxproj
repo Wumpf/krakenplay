@@ -12,6 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\test_sfml\main.cpp" />
+    <ClCompile Include="..\test_sfml\player.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\test_sfml\player.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F56C29B3-17A4-464D-8C04-5F5507C7D710}</ProjectGuid>
