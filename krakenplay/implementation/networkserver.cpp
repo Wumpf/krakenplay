@@ -1,6 +1,6 @@
 #include "../networkserver.h"
-#include "../messages.h"
 #include "../inputmanager.h"
+#include "../Time/Stopwatch.h"
 
 #include <iostream>
 #include <cassert>
@@ -13,9 +13,11 @@ namespace Krakenplay
 		return server;
 	}
 
-	bool NetworkServer::InitServer(uint16_t port)
+	bool NetworkServer::InitServer(uint16_t messagePort, uint16_t identifyPort)
 	{	
 		DeInitServer();
+		this->messagePort = messagePort;
+		this->identifyPort = identifyPort;
 
 		// Initialize winsock - multiple initializations are not bad, infact there is reference counting mechanism
 		// http://stackoverflow.com/questions/1869689/is-it-possible-to-tell-if-wsastartup-has-been-called-in-a-process
@@ -26,17 +28,29 @@ namespace Krakenplay
 			return false;
 		}
 
+		// Create broadcast socket
+		if ((broadcastSocket = socket(AF_INET, SOCK_DGRAM, AF_UNSPEC)) == INVALID_SOCKET)
+		{
+			std::cerr << "Could not create server-broadcast socket: " << WSAGetLastError() << std::endl;
+		}
+		bool broadcastVal = true;
+		if (setsockopt(broadcastSocket, SOL_SOCKET, SO_BROADCAST, (char *)&broadcastVal, sizeof(broadcastVal)) == SOCKET_ERROR)
+		{
+			std::cerr << "Could not set server-broadcast to allow broadcasts (setsockopt). Error code: " << WSAGetLastError() << std::endl;
+		}
+
+
 		// Create server socket.
 		if((serverSocket = socket(AF_INET, SOCK_DGRAM, AF_UNSPEC)) == INVALID_SOCKET)
 		{
-			std::cerr << "Could not create socket: " << WSAGetLastError() << std::endl;
+			std::cerr << "Could not create server-receive socket: " << WSAGetLastError() << std::endl;
 		}
 
 		// Prepare the sockaddr_in structure.
 		sockaddr_in clientAddr;
 		clientAddr.sin_family = AF_INET;
 		clientAddr.sin_addr.s_addr = INADDR_ANY;
-		clientAddr.sin_port = htons(port);
+		clientAddr.sin_port = htons(messagePort);
 
 		// Bind
 		if(bind(serverSocket, (struct sockaddr *)&clientAddr, sizeof(clientAddr)) == SOCKET_ERROR)
@@ -45,11 +59,18 @@ namespace Krakenplay
 			return false;
 		}
 
-		// Open thread for receiving
+
+		// Open threads for receiving and autoconnect
 		serverRunning = true;
 		receiveThread = std::thread(std::bind(&Krakenplay::NetworkServer::Receive, this));
-	
+		identifyThread = std::thread(std::bind(&Krakenplay::NetworkServer::Identify, this));
+
 		return true;
+	}
+
+	void NetworkServer::SetIdentifyMessageRate(unsigned int identifyMessageRateMS)
+	{
+		this->identifyMessageRateMS = identifyMessageRateMS;
 	}
 
 	void NetworkServer::Receive()
@@ -100,15 +121,54 @@ namespace Krakenplay
 		}
 	}
 
+	void NetworkServer::Identify()
+	{
+		sockaddr_in clientAddr;
+		clientAddr.sin_family = AF_INET;
+		clientAddr.sin_port = htons(identifyPort);
+		clientAddr.sin_addr.s_addr = INADDR_BROADCAST;
+
+		MessageChunkHeader identifyMessage;
+		identifyMessage.messageType = MessageChunkType::SERVER_IDENTIFY;
+		identifyMessage.deviceIndex = g_protocolVersion;
+
+		Krakenplay::Stopwatch stopwatch;
+
+		while (serverRunning && identifyMessageRateMS > 0)
+		{
+			stopwatch.StopAndReset();
+			stopwatch.Resume();
+
+			if (sendto(broadcastSocket, reinterpret_cast<char*>(&identifyMessage), sizeof(identifyMessage), 0, reinterpret_cast<sockaddr*>(&clientAddr), sizeof(clientAddr)) == SOCKET_ERROR)
+			{
+				if (serverRunning && identifyMessageRateMS > 0)
+					std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
+				continue;
+			}
+
+			// Sleep until message sending needed again.
+			int sleepTimeMS = static_cast<int>(identifyMessageRateMS - stopwatch.GetRunningTotal().GetMilliseconds());
+			if (sleepTimeMS > 0)
+				std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMS));
+		}
+	}
+
 	void NetworkServer::DeInitServer()
 	{
 		if(serverRunning)
 		{
 			serverRunning = false; 
 			closesocket(serverSocket);
+			closesocket(broadcastSocket);
 			WSACleanup();
 			receiveThread.join();
+			identifyThread.join();
 		}
+	}
+
+	NetworkServer::NetworkServer()
+	{
+		SetIdentifyMessageRate();
 	}
 
 	NetworkServer::~NetworkServer()

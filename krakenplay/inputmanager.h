@@ -67,7 +67,7 @@ namespace Krakenplay
 		};
 
 
-		/// Returns the current device state of a given type by providing a global device ID.
+		/// \brief Returns the current device state of a given type by providing a global device ID.
 		///
 		/// If there is no mouse state with the given ID, nullptr will be returned. 
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
@@ -75,7 +75,7 @@ namespace Krakenplay
 		template<typename StateType>
 		const StateType* GetState(unsigned int globalDeviceID) const;
 
-		/// Returns the current device state of a given type by providing a client ID and a client device ID.
+		/// \brief Returns the current device state of a given type by providing a client ID and a client device ID.
 		///
 		/// If there is no mouse state with the given IDs, nullptr will be returned. 
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
@@ -83,22 +83,26 @@ namespace Krakenplay
 		template<typename StateType>
 		const StateType* GetState(uint16_t clientID, uint8_t clientDeviceID) const;
 
-		/// Returns the number of known mouse devices.
+		/// \brief Returns the number of known mouse devices.
+		///
 		/// May contain also disconnected devices.
 		unsigned int GetNumMouses() const;
 
-		/// Returns the number of connected mouse devices.
+		/// \brief Returns the number of connected mouse devices.
+		///
 		/// There may be disconnected devices residing in the list as well.
 		unsigned int GetNumConnectedMouses() const;
 
 
 
-		/// Sets after which time without update a device is considered disconnected.
+		/// \brief Sets after which time without update a device is considered disconnected.
+		///
 		/// Note that if a device is orderly shut down, the InputManager/NetworkServer should receive a disconnect message
 		/// that will cause the device to be marked disconnected immediately.
 		void SetConnectionTimeout(Time deviceConnectionTimeout = Time::Seconds(1.0f));
 
-		/// Receives an input message. This method is thread-safe.
+		/// \brief Receives an input message. This method is thread-safe.
+		///
 		/// Krakenplay::NetworkServer uses this method in its receive thread.
 		void ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientID);
 

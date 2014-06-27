@@ -10,16 +10,26 @@ namespace Krakenplay
 #pragma pack(push)
 #pragma pack(1)
 
-	/// Specifies the different types of available network messages.
+	/// \brief Specifies the different types of available network messages.
 	enum class MessageChunkType : uint8_t
 	{
 		MOUSE_DISCONNECT,
 		MOUSE_STATUS,
 
+		KEYBOARD_DISCONNECT,
+		KEYBOARD_STATUS,
+
+		GAMEPAD_DISCONNECT,
+		GAMEPAD_STATUS,
+
+		SERVER_IDENTIFY, ///< Device index of chunk header is used for protocol version.
+
 		NUM_MESSAGES
 	};
 
-	/// Header for a message chunk. A single network message can consist of multiple message chunks.
+	/// \brief Header for a message chunk.
+	///
+	/// A single network message can consist of multiple message chunks.
 	/// After it follows either a message body with GetMessageBodySize bytes length.
 	struct MessageChunkHeader
 	{
@@ -73,6 +83,14 @@ namespace Krakenplay
 	/// A single network message never exceeds this size in bytes.
 	/// This gives a limitation to the number of messages that can be chained together.
 	const unsigned int g_maxMessageSize = 2048;
+
+	/// Default port for all normal Krakenplay network messages.
+	const uint16_t g_defaultMessagePort = 12445;
+	/// Default port for all Krakenplay server identify broadcasts.
+	const uint16_t g_defaultIdentifyPort = 12446;
+
+	/// Current protocol version, see MessageChunkType::SERVER_IDENTIFY.
+	const uint8_t g_protocolVersion = 0;
 }
 
 #undef SET_BIT

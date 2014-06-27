@@ -12,11 +12,16 @@ namespace Krakenplay
 	const double g_maxDurationBetweenMessage_ms = 24.0;
 	const double g_minDurationBetweenMessage_ms =  2.0;
 
+	const char g_serverIdentifyMessage[16] = "kraken_01_serve"; // exactly 16 chars!
+
 	unsigned int GetMessageBodySize(MessageChunkType bodyType)
 	{
 		switch (bodyType)
 		{
 		case Krakenplay::MessageChunkType::MOUSE_DISCONNECT:
+		case Krakenplay::MessageChunkType::GAMEPAD_DISCONNECT:
+		case Krakenplay::MessageChunkType::KEYBOARD_DISCONNECT:
+		case Krakenplay::MessageChunkType::SERVER_IDENTIFY:
 			return 0;
 			break;
 
@@ -91,8 +96,12 @@ namespace Krakenplay
 			// Pass to input manager.
 			switch(header->messageType)
 			{
-			case MessageChunkType::MOUSE_DISCONNECT:
+			case Krakenplay::MessageChunkType::MOUSE_DISCONNECT:
+			case Krakenplay::MessageChunkType::GAMEPAD_DISCONNECT:
+			case Krakenplay::MessageChunkType::KEYBOARD_DISCONNECT:
+			case Krakenplay::MessageChunkType::SERVER_IDENTIFY:
 				break;
+
 			case MessageChunkType::MOUSE_STATUS:
 			{
 				InternalMouseState* internalMouseState = reinterpret_cast<InternalMouseState*>(&messageBlock[readPos]);

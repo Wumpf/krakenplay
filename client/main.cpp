@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 	{
 		std::cout << "Init input fetching system ...";
 		Krakenplay::InputFetcher inputFetcher;
+		std::cout << "\n";
 
 		std::cout << "Init client ... ";
 		Krakenplay::NetworkClient client;
@@ -22,9 +23,21 @@ int main(int argc, char** argv)
 			return 1;
 		}
 
-		if(argc > 1)
+		if (argc > 1)
 			client.SetServerAddress(argv[1]);
-
+		else
+		{
+			std::cout << "Waiting for server identify-message ... ";
+			if (client.WaitForServerIdentifyMessage())
+				std::cout << "done\n";
+			else
+			{
+				std::cout << "failed\n";
+				return 1;
+			}
+		}
+		std::cout << "Using server address " << client.GetServerAdress() << "\n\n";
+		
 		for (;;)
 		{
 			inputFetcher.Update(client);
