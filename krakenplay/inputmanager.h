@@ -9,25 +9,30 @@
 
 namespace Krakenplay
 {
-	/// The Krakenplay input manager singleton class.
-	/// All states are double buffered, so that the Krakenplay::NetworkServer can update the data in parallel.
+	/// \brief The Krakenplay input manager singleton class.
+	///
+	/// Internally all states are hold three times buffered. Once for writing (possibly in parallel) and two times for reading (old and current).
 	class InputManager
 	{
 	public:
+		/// Returns singleton instance.
 		static InputManager& Instance();
 
-		/// Updates connection timeouts and copies current data from the read state to the write state.
+		/// \brief Updates connection timeouts and copies current data from the read state to the write state.
+		///
+		/// All WasPressed/Released methods rely on this call. This method locks the internal write state that can be accessed in parallel.
+		/// You should call this method frequently.
 		void Update();
 		
-		/// Device info, contained in all concrete device infos.
+		/// \brief Device info, contained in all concrete device infos.
 		template<typename ChildClass>
 		class DeviceState
 		{
 		public:
-			/// Checks if the given device changed from connected to disconnected in the last update.
+			/// \brief Checks if the given device changed from connected to disconnected in the last update.
 			bool WasDisconnected() const;
 
-			/// Checks if the given device disconnected to connected in the last update.
+			/// \brief Checks if the given device disconnected to connected in the last update.
 			bool WasConnected() const;
 		
 			/// Timestamp of the last received update.

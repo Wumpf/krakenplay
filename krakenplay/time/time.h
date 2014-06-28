@@ -80,6 +80,7 @@ namespace Krakenplay
 
 	public: // private:
 
+		/// Initializes timer. This happens automatically!
 		static void Initialize();
 	};
 

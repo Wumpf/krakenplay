@@ -33,8 +33,8 @@ namespace Krakenplay
 	/// After it follows either a message body with GetMessageBodySize bytes length.
 	struct MessageChunkHeader
 	{
-		MessageChunkType messageType;
-		uint8_t deviceIndex; ///< Most messages are about devices - this is the client-local device index.
+		MessageChunkType messageType;	///< Message type this chunk. Use GetMessageBodySize to get the size of the following body.
+		uint8_t deviceIndex;			///< Most messages are about devices - this is the client-local device index.
 	};
 
 	/// Returns the size of the message body for the given type.
@@ -60,9 +60,27 @@ namespace Krakenplay
 	{
 		InternalMouseState() : positionX(0), positionY(0), mouseWheel(0), buttonState(static_cast<MouseButton>(0)) {}
 
+		/// \brief Current x-position of the mouse.
+		/// 
+		/// Note that this value is not dependend on the actual screen position of the corresponding mouse cursor of the client machine.
+		/// Instead the InputFetcher accumulates mouse movement deltas.
 		int32_t positionX;
+
+		/// \brief Current y-position of the mouse.
+		/// 
+		/// Note that this value is not dependend on the actual screen position of the corresponding mouse cursor of the client machine.
+		/// Instead the InputFetcher accumulates mouse movement deltas.
 		int32_t positionY;
+
+		/// \brief Current position of the mouse-wheel.
+		/// 
+		/// Note that this value is not dependend on the actual screen position of the corresponding mouse cursor of the client machine.
+		/// Instead the InputFetcher accumulates mouse movement deltas.
 		int32_t mouseWheel;
+
+		/// \brief Current mouse state as bitmask.
+		///
+		/// If buttonState & static_cast<uint8_t>(MouseButton::<i>button_of_choice</i>) > 0 then <i>button_of_choice</i> is pressed.
 		MouseButton buttonState;
 	};
 

@@ -15,6 +15,7 @@ namespace Krakenplay
 	class NetworkServer
 	{
 	public:
+		/// Returns singleton instance.
 		static NetworkServer& Instance();
 
 		/// \brief Inits server on a given port.

@@ -10,6 +10,8 @@ namespace Krakenplay
 	class MouseFetcher : public OIS::MouseListener, public InputFetchDevice
 	{
 	public:
+		/// Creates and initializes the mouse fetcher.
+		/// \param inputManager		Used ois input manager.
 		MouseFetcher(OIS::InputManager* inputManager);
 		~MouseFetcher();
 
@@ -25,8 +27,12 @@ namespace Krakenplay
 		{ return &stateMessageHeader; }
 
 		// OIS Callback functions:
+
+		/// OIS callback for mouse movement.
 		bool mouseMoved(const OIS::MouseEvent &arg) override;
+		/// OIS callback for mouse press events.
 		bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id) override;
+		/// OIS callback for mouse released events.
 		bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id) override;
 
 	private:
