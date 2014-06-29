@@ -72,6 +72,24 @@ namespace Krakenplay
 		};
 
 
+		/// Device info for gamepads.
+		class GamepadState : public DeviceState<GamepadState>
+		{
+		public:
+			/// Checks if the given gamepad button is currently down.
+			bool IsButtonDown(GamepadButton button) const;
+
+			/// Checks if the given gamepad button changed from not-down to down in the last update.
+			bool WasButtonPressed(GamepadButton button) const;
+
+			/// Checks if the given gamepad button changed from down to not-down in the last update.
+			bool WasButtonReleased(GamepadButton button) const;
+
+			/// Current gamepad state data.
+			InternalGamepadState state;
+		};
+
+
 		/// \brief Returns the current device state of a given type by providing a global device ID.
 		///
 		/// If there is no mouse state with the given ID, nullptr will be returned. 
@@ -99,6 +117,16 @@ namespace Krakenplay
 		unsigned int GetNumConnectedMouses() const;
 
 
+		/// \brief Returns the number of known gamepad devices.
+		///
+		/// May contain also disconnected devices.
+		unsigned int GetNumGamepads() const;
+
+		/// \brief Returns the number of connected gamepad devices.
+		///
+		/// There may be disconnected devices residing in the list as well.
+		unsigned int GetNumConnectedGamepads() const;
+
 
 		/// \brief Sets after which time without update a device is considered disconnected.
 		///
@@ -124,6 +152,9 @@ namespace Krakenplay
 
 			std::vector<MouseState> mouseStates;
 			unsigned int numConnectedMouses;
+
+			std::vector<GamepadState> gamepadStates;
+			unsigned int numConnectedGamepads;
 
 			/// Retrieves either the mouse info with the given indices or returns a new/reused slot.
 			/// For the latter the indices will registered onto the given device slot. Connection state and last update will *not* be changed.

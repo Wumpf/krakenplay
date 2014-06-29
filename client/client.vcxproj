@@ -85,12 +85,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="gamepadfetcher.h" />
     <ClInclude Include="inputfetchdevice.h" />
     <ClInclude Include="inputfetcher.h" />
     <ClInclude Include="mousefetcher.h" />
     <ClInclude Include="networkclient.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="implementation\gamepadfetcher.cpp" />
     <ClCompile Include="implementation\inputfetcher.cpp" />
     <ClCompile Include="implementation\mousefetcher.cpp" />
     <ClCompile Include="implementation\networkclient.cpp" />

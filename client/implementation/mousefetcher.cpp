@@ -2,6 +2,7 @@
 #include <OISInputManager.h>
 #include <cassert>
 #include <iostream>
+
 namespace Krakenplay
 {
 	MouseFetcher::MouseFetcher(OIS::InputManager* inputManager) : inputManager(inputManager)

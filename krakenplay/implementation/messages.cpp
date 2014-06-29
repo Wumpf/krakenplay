@@ -1,6 +1,7 @@
 #include "../messages.h"
 #include <cassert>
 #include <WinSock2.h>
+#include <type_traits>
 
 namespace Krakenplay
 {
@@ -27,6 +28,10 @@ namespace Krakenplay
 
 		case Krakenplay::MessageChunkType::MOUSE_STATUS:
 			return sizeof(InternalMouseState);
+			break;
+
+		case Krakenplay::MessageChunkType::GAMEPAD_STATUS:
+			return sizeof(InternalGamepadState);
 			break;
 
 		default:
@@ -66,7 +71,7 @@ namespace Krakenplay
 	}
 	template<> void ConvertEndianess<true, int16_t>(int16_t& data)
 	{
-		*reinterpret_cast<uint32_t*>(&data) = htons(*reinterpret_cast<uint32_t*>(&data));
+		*reinterpret_cast<uint16_t*>(&data) = htons(*reinterpret_cast<uint16_t*>(&data));
 	}
 	template<> void ConvertEndianess<false, int16_t>(int16_t& data)
 	{
@@ -104,10 +109,22 @@ namespace Krakenplay
 
 			case MessageChunkType::MOUSE_STATUS:
 			{
-				InternalMouseState* internalMouseState = reinterpret_cast<InternalMouseState*>(&messageBlock[readPos]);
-				ConvertEndianess<hostToNetwork>(internalMouseState->mouseWheel);
-				ConvertEndianess<hostToNetwork>(internalMouseState->positionX);
-				ConvertEndianess<hostToNetwork>(internalMouseState->positionY);
+				InternalMouseState* internalState = reinterpret_cast<InternalMouseState*>(&messageBlock[readPos]);
+				ConvertEndianess<hostToNetwork>(internalState->mouseWheel);
+				ConvertEndianess<hostToNetwork>(internalState->positionX);
+				ConvertEndianess<hostToNetwork>(internalState->positionY);
+				break;
+			}
+
+			case MessageChunkType::GAMEPAD_STATUS:
+			{
+				InternalGamepadState* internalState = reinterpret_cast<InternalGamepadState*>(&messageBlock[readPos]);
+
+				ConvertEndianess<hostToNetwork>(*reinterpret_cast<int16_t*>(&internalState->buttons));
+				ConvertEndianess<hostToNetwork>(internalState->thumbLX);
+				ConvertEndianess<hostToNetwork>(internalState->thumbLY);
+				ConvertEndianess<hostToNetwork>(internalState->thumbRX);
+				ConvertEndianess<hostToNetwork>(internalState->thumbRY);
 				break;
 			}
 

@@ -1,5 +1,6 @@
 #include "../inputfetcher.h"
 #include "../mousefetcher.h"
+#include "../gamepadfetcher.h"
 #include "../networkclient.h"
 
 #include "../../krakenplay/Time/time.h"
@@ -132,8 +133,8 @@ namespace Krakenplay
 		// Print debugging information
 		unsigned int v = inputManager->getVersionNumber();
 		std::cout << "OIS Version: " << (v >> 16) << "." << ((v >> 8) & 0x000000FF) << "." << (v & 0x000000FF)
-			<< "\nRelease Name: " << inputManager->getVersionName()
-			<< "\nManager: " << inputManager->inputSystemName() << std::endl;
+					<< "\nRelease Name: " << inputManager->getVersionName()
+					<< "\nManager: " << inputManager->inputSystemName() << std::endl;
 	}
 
 
@@ -214,6 +215,11 @@ namespace Krakenplay
 				case OIS::OISMouse:
 					std::cout << "Connected Mouse. " << " Vendor: " << i->second << "\n";
 					devices.push_back(new MouseFetcher(inputManager));
+					break;
+
+				case OIS::OISJoyStick:
+					std::cout << "Connected Gamepad. " << " Vendor: " << i->second << "\n";
+					devices.push_back(new GamepadFetcher(inputManager));
 					break;
 
 				//default:

@@ -41,6 +41,7 @@ namespace Krakenplay
 	unsigned int GetMessageBodySize(MessageChunkType bodyType);
 
 	/// Mouse button bit mask definition. Compatible to OIS::MouseButtonID
+	/// \see InternalMouseState
 	enum class MouseButton : uint8_t
 	{
 		LEFT = SET_BIT(0),
@@ -78,10 +79,71 @@ namespace Krakenplay
 		/// Instead the InputFetcher accumulates mouse movement deltas.
 		int32_t mouseWheel;
 
-		/// \brief Current mouse state as bitmask.
+		/// \brief Current mouse button state as bitmask.
 		///
 		/// If buttonState & static_cast<uint8_t>(MouseButton::<i>button_of_choice</i>) > 0 then <i>button_of_choice</i> is pressed.
 		MouseButton buttonState;
+	};
+
+	/// Mouse button bit mask definition.
+	///
+	/// Fully compatible with XINPUT_GAMEPAD (http://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.xinput_gamepad%28v=vs.85%29.aspx)
+	/// \see InternalGamepadState
+	enum class GamepadButton : uint16_t
+	{
+		DPAD_UP = SET_BIT(0),
+		DPAD_DOWN = SET_BIT(1),
+		DPAD_LEFT = SET_BIT(2),
+		DPAD_RIGHT = SET_BIT(3),
+		START = SET_BIT(4),
+		BACK = SET_BIT(5),
+		LEFT_THUMB = SET_BIT(6),
+		RIGHT_THUMB = SET_BIT(7),
+		LEFT_SHOULDER = SET_BIT(8),
+		RIGHT_SHOULDER = SET_BIT(9),
+		A = SET_BIT(10),
+		B = SET_BIT(11),
+		X = SET_BIT(12),
+		Y = SET_BIT(13),
+
+		NUM_BUTTONS = 14
+	};
+
+	/// \brief Gamepad state object. Body of MessageType::GAMEPAD_STATUS.
+	///
+	/// Yes, this resembles exactly an XBox360 Gamepad, since this is the defacto standard on computers at the moment.
+	/// Krakenplay will try to map any controller on any system correctly to this structure. However the mapping can go wrong in many ways.
+	/// If you encounter any miss-mapping or missing buttons please report or take a look into gamepadfetcher.cpp yourself, thanks!
+	/// The structure is fully compatible with XINPUT_GAMEPAD (http://msdn.microsoft.com/en-us/library/windows/desktop/microsoft.directx_sdk.reference.xinput_gamepad%28v=vs.85%29.aspx)
+	struct InternalGamepadState
+	{
+		/// \brief Current gamepad button state as bitmask.
+		///
+		/// If buttonState & static_cast<uint8_t>(GamepadButton::<i>button_of_choice</i>) > 0 then <i>button_of_choice</i> is pressed.
+		GamepadButton buttons;
+		
+		/// The current value of the left trigger analog control. The value is between 0 and 255.
+		int8_t leftTrigger;
+		/// The current value of the right trigger analog control. The value is between 0 and 255.
+		int8_t rightTrigger;
+
+		/// \brief Left thumbstick x-axis value. The value is between -32768 and 32767.
+		/// 
+		/// Usually a value of 0 means centered. However a deadzone may be needed!
+		int16_t thumbLX;
+		/// \brief Left thumbstick y-axis value. The value is between -32768 and 32767.
+		/// 
+		/// Usually a value of 0 means centered. However a deadzone may be needed!
+		int16_t thumbLY;
+
+		/// \brief Right thumbstick x-axis value. The value is between -32768 and 32767.
+		/// 
+		/// Usually a value of 0 means centered. However a deadzone may be needed!
+		int16_t thumbRX;
+		/// \brief Right thumbstick y-axis value. The value is between -32768 and 32767.
+		/// 
+		/// Usually a value of 0 means centered. However a deadzone may be needed!
+		int16_t thumbRY;
 	};
 
 #pragma pack(pop)

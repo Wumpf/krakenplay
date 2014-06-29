@@ -18,6 +18,40 @@ namespace Krakenplay
 	{
 	}
 
+	template<typename StateList>
+	void HandleNewConnects(StateList& newStateList, StateList& oldStateList)
+	{
+		for (unsigned int i = 0; i < newStateList.size(); ++i)
+		{
+			if (oldStateList.size() <= i)
+			{
+				oldStateList.push_back(newStateList[i]);
+				oldStateList.back().connected = false;
+			}
+
+			else if (newStateList[i].WasConnected())
+			{
+				assert(oldStateList[i].clientDeviceID == newStateList[i].clientDeviceID &&
+					oldStateList[i].clientID == newStateList[i].clientID && "Inconsistent IDs across new and old read state!");
+				oldStateList[i] = newStateList[i];
+				oldStateList[i].connected = false;
+			}
+		}
+	}
+
+	template<typename StateList>
+	void HandleConnectionTimeouts(StateList& writeState, unsigned int& connectionCounter, Time deviceConnectionTimeout)
+	{
+		Time now = Time::Now();
+		connectionCounter = 0;
+		for (auto& info : writeState)
+		{
+			info.connected = info.connected && (now - info.lastUpdate < deviceConnectionTimeout);
+			if (info.connected)
+				++connectionCounter;
+		}
+	}
+
 	void InputManager::Update()
 	{
 		oldReadState = readState;
@@ -25,14 +59,8 @@ namespace Krakenplay
 		inputWriteMutex.lock();
 
 		// Check device connection timeouts.
-		Time now = Time::Now(); // Time::Now can be costly, so do it only once per update.
-		writeState.numConnectedMouses = 0;
-		for (MouseState& info : writeState.mouseStates)
-		{
-			info.connected = info.connected && (now - info.lastUpdate < deviceConnectionTimeout);
-			if (info.connected)
-				++writeState.numConnectedMouses;
-		}
+		HandleConnectionTimeouts(writeState.mouseStates, writeState.numConnectedMouses, deviceConnectionTimeout);
+		HandleConnectionTimeouts(writeState.gamepadStates, writeState.numConnectedGamepads, deviceConnectionTimeout);
 
 		// Copy write state to read state.
 		readState = writeState;
@@ -40,22 +68,8 @@ namespace Krakenplay
 		inputWriteMutex.unlock();
 
 		// For state that switched from disconnected to connected, reset state to current state to avoid wrong state changes.
-		for(unsigned int i = 0; i < readState.mouseStates.size(); ++i)
-		{
-			if(oldReadState.mouseStates.size() <= i)
-			{
-				oldReadState.mouseStates.push_back(readState.mouseStates[i]);
-				oldReadState.mouseStates.back().connected = false;
-			}
-
-			else if(readState.mouseStates[i].WasConnected())
-			{
-				assert(oldReadState.mouseStates[i].clientDeviceID == readState.mouseStates[i].clientDeviceID &&
-						oldReadState.mouseStates[i].clientID == readState.mouseStates[i].clientID && "Inconsistent IDs across new and old read state!");
-				oldReadState.mouseStates[i] = readState.mouseStates[i];
-				oldReadState.mouseStates[i].connected = false;
-			}
-		}
+		HandleNewConnects(readState.mouseStates, oldReadState.mouseStates);
+		HandleNewConnects(readState.gamepadStates, oldReadState.gamepadStates);
 	}
 
 	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientID)
@@ -69,18 +83,35 @@ namespace Krakenplay
 		{
 		case MessageChunkType::MOUSE_STATUS:
 		{
-			MouseState& mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
-			mouseInfoSlot.connected = true;
-			mouseInfoSlot.lastUpdate = Time::Now();
-			memcpy(&mouseInfoSlot.state, messageBody, messageBodySize);
+			MouseState& infoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			infoSlot.connected = true;
+			infoSlot.lastUpdate = Time::Now();
+			memcpy(&infoSlot.state, messageBody, messageBodySize);
 			break;
 		}
 
 		case MessageChunkType::MOUSE_DISCONNECT:
 		{
-			MouseState& mouseInfoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
-			mouseInfoSlot.connected = false;
-			mouseInfoSlot.lastUpdate = Time::Now();
+			MouseState& infoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			infoSlot.connected = false;
+			infoSlot.lastUpdate = Time::Now();
+			break;
+		}
+
+		case MessageChunkType::GAMEPAD_STATUS:
+		{
+			GamepadState& infoSlot = writeState.GetInfoSlot<GamepadState>(clientID, header.deviceIndex);
+			infoSlot.connected = true;
+			infoSlot.lastUpdate = Time::Now();
+			memcpy(&infoSlot.state, messageBody, messageBodySize);
+			break;
+		}
+
+		case MessageChunkType::GAMEPAD_DISCONNECT:
+		{
+			GamepadState& infoSlot = writeState.GetInfoSlot<GamepadState>(clientID, header.deviceIndex);
+			infoSlot.connected = false;
+			infoSlot.lastUpdate = Time::Now();
 			break;
 		}
 
