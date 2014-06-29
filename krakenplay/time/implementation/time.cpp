@@ -15,10 +15,10 @@ namespace
 // Include inline file
 #if defined(_WIN32)
   #include "time_win.h"
-#elif defined(__unix__)
-  #include "time_osx.h"
-#elif defined(__APPLE__)
+#elif defined(__unix)
   #include "time_posix.h"
+#elif defined(__APPLE__)
+  #include "time_osx.h"
 #else
   #error "Time functions are not implemented on current platform"
 #endif

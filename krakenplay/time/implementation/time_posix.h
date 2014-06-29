@@ -1,14 +1,18 @@
-#include "time.h"
+#include "../time.h"
+#include <ctime>
 
-void Time::Initialize()
+namespace Krakenplay
 {
-}
+	void Time::Initialize()
+	{
+	}
 
-Time Time::Now()
-{
-  struct timespec sp;
-  clock_gettime(CLOCK_MONOTONIC_RAW, &sp);
+	Time Time::Now()
+	{
+	  struct timespec sp;
+	  clock_gettime(CLOCK_MONOTONIC_RAW, &sp);
 
-  return Time::Seconds( (double)sp.tv_sec + (double)(sp.tv_nsec / 1000000000.0));
+	  return Time::Seconds( (double)sp.tv_sec + (double)(sp.tv_nsec / 1000000000.0));
+	}
 }
 

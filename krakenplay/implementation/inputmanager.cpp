@@ -1,6 +1,8 @@
 #include "../inputmanager.h"
-#include <assert.h>
+#include <cassert>
+#include <cstring>
 #include <iostream>
+
 namespace Krakenplay
 {
 	InputManager& InputManager::Instance()

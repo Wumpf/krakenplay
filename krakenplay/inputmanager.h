@@ -1,7 +1,7 @@
 #pragma once
 
 #include "messages.h"
-#include "Time/time.h"
+#include "time/time.h"
 
 #include <mutex>
 #include <vector>
@@ -168,7 +168,7 @@ namespace Krakenplay
 			std::vector<DeviceType>& GetDeviceStates();
 
 			/// Gets mouse device states.
-			template<> const std::vector<MouseState>& GetDeviceStates<MouseState>() const;
+			template<> const std::vector<Krakenplay::InputManager::MouseState>& GetDeviceStates<Krakenplay::InputManager::MouseState>() const;
 			template<> std::vector<MouseState>& GetDeviceStates<MouseState>();
 		};
 

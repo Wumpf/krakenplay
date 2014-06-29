@@ -91,4 +91,4 @@ namespace Krakenplay
 	Time operator/ (double f, Time t);
 }
 
-#include "Implementation/Time_inl.h"
+#include "implementation/time_inl.h"

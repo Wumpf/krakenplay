@@ -1,4 +1,4 @@
-#include "../Stopwatch.h"
+#include "../stopwatch.h"
 
 namespace Krakenplay
 {
