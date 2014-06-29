@@ -1,0 +1,3 @@
+[submodule "dependencies/ois"]
+	path = dependencies/ois
+	url = https://github.com/wgois/Object-oriented-Input-System--OIS-.git

@@ -58,7 +58,7 @@ namespace Krakenplay
 			
 			unsigned int buttonNum = std::min<unsigned int>(inputObject->getNumberOfComponents(OIS::OIS_Button), sizeof(currentState.buttons) * 8 - 4);
 			for (unsigned int i = 0; i < buttonNum; ++i)
-				buttonCode &= inputObject->getJoyStickState().mButtons[i] ? (1 << i) : 0;
+				buttonCode |= inputObject->getJoyStickState().mButtons[i] ? (1 << i) : 0;
 			currentState.buttons = static_cast<GamepadButton>(buttonCode);
 		}
 
