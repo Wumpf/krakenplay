@@ -56,6 +56,11 @@ Player::Player() :
 
 void Player::Draw(sf::RenderWindow& renderWindow)
 {
+	while(position.x < 0) position.x += windowWidth;
+	while(position.x > windowWidth) position.x -= windowWidth;
+	while(position.y < 0) position.y += windowHeight;
+	while(position.y > windowWidth) position.y -= windowHeight;
+
 	const float circleRadius = 10;
 	sf::CircleShape circle(circleRadius, 16);
 	circle.setOutlineColor(sf::Color::White);
@@ -73,21 +78,51 @@ Mouse::Mouse(unsigned int idx) : idx(idx)
 	mouseStart.x = InputManager::Instance().GetState<InputManager::MouseState>(idx)->state.positionX;
 	mouseStart.y = InputManager::Instance().GetState<InputManager::MouseState>(idx)->state.positionY;
 }
-
 void Mouse::Update()
 {
 	position.x = static_cast<float>(InputManager::Instance().GetState<InputManager::MouseState>(idx)->state.positionX - mouseStart.x);
-	while(position.x < 0) position.x += windowWidth;
-	while(position.x > windowWidth) position.x -= windowWidth;
-
 	position.y = static_cast<float>(InputManager::Instance().GetState<InputManager::MouseState>(idx)->state.positionY - mouseStart.y);
-	while(position.y < 0) position.y += windowHeight;
-	while(position.y > windowWidth) position.y -= windowHeight;
-
 	effect = InputManager::Instance().GetState<InputManager::MouseState>(idx)->IsButtonDown(MouseButton::LEFT);
 }
-
 bool Mouse::IsAlive()
 {
 	return InputManager::Instance().GetState<InputManager::MouseState>(idx)->connected;
+}
+
+const float Keyboard::speedScale = 0.1f;
+Keyboard::Keyboard(unsigned int idx) : idx(idx)
+{
+}
+
+void Keyboard::Update()
+{
+	position.x -= InputManager::Instance().GetState<InputManager::KeyboardState>(idx)->IsButtonDown(Krakenplay::KeyboardKey::LEFT) ? speedScale : 0;
+	position.x += InputManager::Instance().GetState<InputManager::KeyboardState>(idx)->IsButtonDown(Krakenplay::KeyboardKey::RIGHT) ? speedScale : 0;
+	position.y -= InputManager::Instance().GetState<InputManager::KeyboardState>(idx)->IsButtonDown(Krakenplay::KeyboardKey::UP) ? speedScale : 0;
+	position.y += InputManager::Instance().GetState<InputManager::KeyboardState>(idx)->IsButtonDown(Krakenplay::KeyboardKey::DOWN) ? speedScale : 0;
+
+	effect = InputManager::Instance().GetState<InputManager::KeyboardState>(idx)->IsButtonDown(KeyboardKey::SPACE);
+}
+
+bool Keyboard::IsAlive()
+{
+	return InputManager::Instance().GetState<InputManager::KeyboardState>(idx)->connected;
+}
+
+const float Gamepad::speedScale = 0.000008f;
+Gamepad::Gamepad(unsigned int idx) : idx(idx)
+{
+}
+
+void Gamepad::Update()
+{
+	position.x += InputManager::Instance().GetState<InputManager::GamepadState>(idx)->state.thumbLX * speedScale;
+	position.y += InputManager::Instance().GetState<InputManager::GamepadState>(idx)->state.thumbLY * speedScale;
+
+	effect = InputManager::Instance().GetState<InputManager::GamepadState>(idx)->IsButtonDown(GamepadButton::A);
+}
+
+bool Gamepad::IsAlive()
+{
+	return InputManager::Instance().GetState<InputManager::GamepadState>(idx)->connected;
 }

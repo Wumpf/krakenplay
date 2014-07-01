@@ -61,6 +61,18 @@ private:
 			if(InputManager::Instance().GetState<InputManager::MouseState>(mouseIdx)->WasConnected())
 				playerList.push_back(new Mouse(mouseIdx));
 		}
+		// Add keyboard players.
+		for(unsigned int keyboardIdx = 0; keyboardIdx < InputManager::Instance().GetNumKeyboards(); ++keyboardIdx)
+		{
+			if(InputManager::Instance().GetState<InputManager::KeyboardState>(keyboardIdx)->WasConnected())
+				playerList.push_back(new Keyboard(keyboardIdx));
+		}
+		// Add gamepad players.
+		for(unsigned int gamepadIdx = 0; gamepadIdx < InputManager::Instance().GetNumGamepads(); ++gamepadIdx)
+		{
+			if(InputManager::Instance().GetState<InputManager::GamepadState>(gamepadIdx)->WasConnected())
+				playerList.push_back(new Gamepad(gamepadIdx));
+		}
 
 		// Update players.
 		for(auto it = playerList.begin(); it != playerList.end(); ++it)

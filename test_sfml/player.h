@@ -29,3 +29,29 @@ private:
 	sf::Vector2i mouseStart;
 	unsigned int idx;
 };
+
+class Keyboard : public Player
+{
+public:
+	Keyboard(unsigned int idx);
+
+	void Update() override;
+	bool IsAlive() override;
+
+private:
+	unsigned int idx;
+	static const float speedScale;
+};
+
+class Gamepad : public Player
+{
+public:
+	Gamepad(unsigned int idx);
+
+	void Update() override;
+	bool IsAlive() override;
+
+private:
+	unsigned int idx;
+	static const float speedScale;
+};
