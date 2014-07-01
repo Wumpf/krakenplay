@@ -66,21 +66,21 @@ namespace Krakenplay
 
 		// Left analog.
 		if (numAxis > 0)
-			currentState.thumbLX = inputObject->getJoyStickState().mAxes[0].abs;
+			currentState.thumbLX = inputObject->getJoyStickState().mAxes[1].abs;
 		else
 			currentState.thumbLX = 0;
 		if (numAxis > 1)
-			currentState.thumbLY = inputObject->getJoyStickState().mAxes[1].abs;
+			currentState.thumbLY = inputObject->getJoyStickState().mAxes[0].abs;
 		else
 			currentState.thumbLY = 0;
 
 		// Right analog.
 		if (numAxis > 2)
-			currentState.thumbRX = inputObject->getJoyStickState().mAxes[2].abs;
+			currentState.thumbRX = inputObject->getJoyStickState().mAxes[3].abs;
 		else
 			currentState.thumbRX = 0;
 		if (numAxis > 3)
-			currentState.thumbRY = inputObject->getJoyStickState().mAxes[3].abs;
+			currentState.thumbRY = inputObject->getJoyStickState().mAxes[2].abs;
 		else
 			currentState.thumbRY = 0;
 
