@@ -25,7 +25,7 @@ namespace Krakenplay
 		void Update();
 		
 		/// \brief Device info, contained in all concrete device infos.
-		template<typename ChildClass>
+		template<typename ChildClass, typename ButtonType>
 		class DeviceState
 		{
 		public:
@@ -34,6 +34,12 @@ namespace Krakenplay
 
 			/// \brief Checks if the given device disconnected to connected in the last update.
 			bool WasConnected() const;
+
+			/// Checks if the given button/key button changed from not-down to down in the last update.
+			bool WasButtonPressed(ButtonType button) const;
+
+			/// Checks if the given button/key changed from down to not-down in the last update.
+			bool WasButtonReleased(ButtonType button) const;
 		
 			/// Timestamp of the last received update.
 			Time lastUpdate;
@@ -55,35 +61,33 @@ namespace Krakenplay
 		};
 
 		/// Device info for mouses.
-		class MouseState : public DeviceState<MouseState>
+		class MouseState : public DeviceState<MouseState, MouseButton>
 		{
 		public:
 			/// Checks if the given mouse button is currently down.
 			bool IsButtonDown(MouseButton button) const;
 
-			/// Checks if the given mouse button changed from not-down to down in the last update.
-			bool WasButtonPressed(MouseButton button) const;
-
-			/// Checks if the given mouse button changed from down to not-down in the last update.
-			bool WasButtonReleased(MouseButton button) const;
-
 			/// Current mouse state data.
 			InternalMouseState state;
 		};
 
+		/// Device info for keyboards.
+		class KeyboardState : public DeviceState<KeyboardState, KeyboardKey>
+		{
+		public:
+			/// Checks if the given keyboard key button is currently down.
+			bool IsButtonDown(KeyboardKey key) const;
+
+			/// Current keyboard state data.
+			InternalKeyboardState state;
+		};
 
 		/// Device info for gamepads.
-		class GamepadState : public DeviceState<GamepadState>
+		class GamepadState : public DeviceState<GamepadState, GamepadButton>
 		{
 		public:
 			/// Checks if the given gamepad button is currently down.
 			bool IsButtonDown(GamepadButton button) const;
-
-			/// Checks if the given gamepad button changed from not-down to down in the last update.
-			bool WasButtonPressed(GamepadButton button) const;
-
-			/// Checks if the given gamepad button changed from down to not-down in the last update.
-			bool WasButtonReleased(GamepadButton button) const;
 
 			/// Current gamepad state data.
 			InternalGamepadState state;
@@ -120,6 +124,17 @@ namespace Krakenplay
 		/// \brief Returns the number of known gamepad devices.
 		///
 		/// May contain also disconnected devices.
+		unsigned int GetNumKeyboards() const;
+
+		/// \brief Returns the number of connected gamepad devices.
+		///
+		/// There may be disconnected devices residing in the list as well.
+		unsigned int GetNumConnectedKeyboards() const;
+
+
+		/// \brief Returns the number of known gamepad devices.
+		///
+		/// May contain also disconnected devices.
 		unsigned int GetNumGamepads() const;
 
 		/// \brief Returns the number of connected gamepad devices.
@@ -148,10 +163,13 @@ namespace Krakenplay
 		/// Assembly of all input states that need to be double buffered.
 		struct InputState
 		{
-			InputState() : numConnectedMouses(0) {}
+			InputState() : numConnectedMouses(0), numConnectedKeyboards(0), numConnectedGamepads(0) {}
 
 			std::vector<MouseState> mouseStates;
 			unsigned int numConnectedMouses;
+
+			std::vector<KeyboardState> keyboardStates;
+			unsigned int numConnectedKeyboards;
 
 			std::vector<GamepadState> gamepadStates;
 			unsigned int numConnectedGamepads;
@@ -170,6 +188,14 @@ namespace Krakenplay
 			/// Gets mouse device states.
 			template<> const std::vector<Krakenplay::InputManager::MouseState>& GetDeviceStates<Krakenplay::InputManager::MouseState>() const;
 			template<> std::vector<MouseState>& GetDeviceStates<MouseState>();
+
+			/// Gets keyboard device states.
+			template<> const std::vector<Krakenplay::InputManager::KeyboardState>& GetDeviceStates<Krakenplay::InputManager::KeyboardState>() const;
+			template<> std::vector<KeyboardState>& GetDeviceStates<KeyboardState>();
+
+			/// Gets gamepad device states.
+			template<> const std::vector<Krakenplay::InputManager::GamepadState>& GetDeviceStates<Krakenplay::InputManager::GamepadState>() const;
+			template<> std::vector<GamepadState>& GetDeviceStates<GamepadState>();
 		};
 
 		InputState readState;		///< State from which is currently read.

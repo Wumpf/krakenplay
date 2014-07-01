@@ -15,6 +15,155 @@ namespace Krakenplay
 
 	const char g_serverIdentifyMessage[16] = "kraken_01_serve"; // exactly 16 chars!
 
+	const char* const keyboardKeyToStringMap[static_cast<unsigned int>(KeyboardKey::NUM_KEYS)] =
+	{
+		"unassigned",
+		"escape",
+		"1",
+		"2",
+		"3",
+		"4",
+		"5",
+		"6",
+		"7",
+		"8",
+		"9",
+		"0",
+		"minus",
+		"equals",
+		"back",
+		"tab",
+		"q",
+		"w",
+		"e",
+		"r",
+		"t",
+		"y",
+		"u",
+		"i",
+		"o",
+		"p",
+		"lbracket",
+		"rbracket",
+		"return",
+		"lcontrol",
+		"a",
+		"s",
+		"d",
+		"f",
+		"g",
+		"h",
+		"j",
+		"k",
+		"l",
+		"semicolon",
+		"apostrophe",
+		"grave",
+		"lshift",
+		"backslash",
+		"z",
+		"x",
+		"c",
+		"v",
+		"b",
+		"n",
+		"m",
+		"comma",
+		"period",
+		"slash",
+		"rshift",
+		"multiply",
+		"lmenu",
+		"space",
+		"capital",
+		"f1",
+		"f2",
+		"f3",
+		"f4",
+		"f5",
+		"f6",
+		"f7",
+		"f8",
+		"f9",
+		"f10",
+		"numlock",
+		"scroll",
+		"numpad7",
+		"numpad8",
+		"numpad9",
+		"subtract",
+		"numpad4",
+		"numpad5",
+		"numpad6",
+		"add",
+		"numpad1",
+		"numpad2",
+		"numpad3",
+		"numpad0",
+		"decimal",
+		"oem_102",
+		"f11",
+		"f12",
+		"f13",
+		"f14",
+		"f15",
+		"kana",
+		"abnt_c1",
+		"convert",
+		"noconvert",
+		"yen",
+		"abnt_c2",
+		"numpadequals",
+		"prevtrack",
+		"at",
+		"colon",
+		"underline",
+		"kanji",
+		"stop",
+		"ax",
+		"unlabeled",
+		"nexttrack",
+		"numpadenter",
+		"rcontrol",
+		"mute",
+		"calculator",
+		"playpause",
+		"mediastop",
+		"volumedown",
+		"volumeup",
+		"webhome",
+		"numpadcomma",
+		"divide",
+		"sysrq",
+		"rmenu",
+		"pause",
+		"home",
+		"up",
+		"pgup",
+		"left",
+		"right",
+		"end",
+		"down",
+		"pgdown",
+		"insert",
+		"delete",
+		"lwin",
+		"rwin",
+		"apps",
+		"power",
+		"sleep",
+		"wake",
+		"websearch",
+		"webfavorites",
+		"webrefresh",
+		"webstop",
+		"webforward",
+		"webback",
+		"mycomputer",
+		"mail",
+		"mediaselect"
+	};
+
 	unsigned int GetMessageBodySize(MessageChunkType bodyType)
 	{
 		switch (bodyType)
@@ -28,6 +177,10 @@ namespace Krakenplay
 
 		case Krakenplay::MessageChunkType::MOUSE_STATUS:
 			return sizeof(InternalMouseState);
+			break;
+
+		case Krakenplay::MessageChunkType::KEYBOARD_STATUS:
+			return sizeof(InternalKeyboardState);
 			break;
 
 		case Krakenplay::MessageChunkType::GAMEPAD_STATUS:
@@ -113,6 +266,11 @@ namespace Krakenplay
 				ConvertEndianess<hostToNetwork>(internalState->mouseWheel);
 				ConvertEndianess<hostToNetwork>(internalState->positionX);
 				ConvertEndianess<hostToNetwork>(internalState->positionY);
+				break;
+			}
+
+			case Krakenplay::MessageChunkType::KEYBOARD_STATUS:
+			{
 				break;
 			}
 

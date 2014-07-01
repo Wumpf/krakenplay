@@ -6,6 +6,7 @@
     <ClInclude Include="mousefetcher.h" />
     <ClInclude Include="networkclient.h" />
     <ClInclude Include="gamepadfetcher.h" />
+    <ClInclude Include="keyboardfetcher.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="implementation">
@@ -24,6 +25,9 @@
       <Filter>implementation</Filter>
     </ClCompile>
     <ClCompile Include="implementation\gamepadfetcher.cpp">
+      <Filter>implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="implementation\keyboardfetcher.cpp">
       <Filter>implementation</Filter>
     </ClCompile>
   </ItemGroup>

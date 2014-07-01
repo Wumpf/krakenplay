@@ -36,8 +36,7 @@ int main()
 	{
 		InputManager::Instance().Update();
 
-		
-		// Mouse
+		// Mouse.
 		for (unsigned int mouseIdx = 0; mouseIdx < InputManager::Instance().GetNumMouses(); ++mouseIdx)
 		{
 			auto mouseState = InputManager::Instance().GetState<InputManager::MouseState>(mouseIdx);
@@ -55,6 +54,26 @@ int main()
 					std::cout << GetDeviceIdentifyString(*mouseState) << "Mouse button " << mouseButtonNames[mouseButtonIdx] << " was pressed!\n";
 				if (mouseState->WasButtonReleased(mouseButton))
 					std::cout << GetDeviceIdentifyString(*mouseState) << "Mouse button " << mouseButtonNames[mouseButtonIdx] << " was released!\n";
+			}
+		}
+
+		// Keyboard
+		for(unsigned int keyboardIdx = 0; keyboardIdx < InputManager::Instance().GetNumKeyboards(); ++keyboardIdx)
+		{
+			auto keyboardState = InputManager::Instance().GetState<InputManager::KeyboardState>(keyboardIdx);
+			if(keyboardState->WasConnected())
+				std::cout << GetDeviceIdentifyString(*keyboardState) << "Keyboard connected!\n";
+			if(keyboardState->WasDisconnected())
+				std::cout << GetDeviceIdentifyString(*keyboardState) << "Keyboard disconnected!\n";
+
+			// All buttons.
+			for(unsigned int keyboardKeyIdx = 0; keyboardKeyIdx < static_cast<unsigned>(KeyboardKey::NUM_KEYS); ++keyboardKeyIdx)
+			{
+				KeyboardKey key = static_cast<KeyboardKey>(keyboardKeyIdx);
+				if(keyboardState->WasButtonPressed(key))
+					std::cout << GetDeviceIdentifyString(*keyboardState) << "Keyboard key " << keyboardKeyToStringMap[keyboardKeyIdx] << " was pressed!\n";
+				if(keyboardState->WasButtonReleased(key))
+					std::cout << GetDeviceIdentifyString(*keyboardState) << "Keyboard key " << keyboardKeyToStringMap[keyboardKeyIdx] << " was released!\n";
 			}
 		}
 

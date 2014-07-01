@@ -1,19 +1,31 @@
 namespace Krakenplay
 {
-	template<typename ChildClass>
-	bool InputManager::DeviceState<ChildClass>::WasDisconnected() const
+	template<typename ChildClass, typename ButtonType>
+	bool InputManager::DeviceState<ChildClass, ButtonType>::WasDisconnected() const
 	{
 		return !connected && GetCorrespondingOldState().connected;
 	}
 
-	template<typename ChildClass>
-	bool InputManager::DeviceState<ChildClass>::WasConnected() const
+	template<typename ChildClass, typename ButtonType>
+	bool InputManager::DeviceState<ChildClass, ButtonType>::WasConnected() const
 	{
 		return connected && !GetCorrespondingOldState().connected;
 	}
 
-	template<typename ChildClass>
-	inline const ChildClass& InputManager::DeviceState<ChildClass>::GetCorrespondingOldState() const
+	template<typename ChildClass, typename ButtonType>
+	inline bool InputManager::DeviceState<ChildClass, ButtonType>::WasButtonPressed(ButtonType button) const
+	{
+		return static_cast<const ChildClass*>(this)->IsButtonDown(button) && !GetCorrespondingOldState().IsButtonDown(button);
+	}
+	template<typename ChildClass, typename ButtonType>
+	inline bool InputManager::DeviceState<ChildClass, ButtonType>::WasButtonReleased(ButtonType button) const
+	{
+		return !static_cast<const ChildClass*>(this)->IsButtonDown(button) && GetCorrespondingOldState().IsButtonDown(button);
+	}
+
+
+	template<typename ChildClass, typename ButtonType>
+	inline const ChildClass& InputManager::DeviceState<ChildClass, ButtonType>::GetCorrespondingOldState() const
 	{
 		assert(InputManager::Instance().GetState<ChildClass>(clientID, clientDeviceID) == this && "GetOldState can only be called on the current readState");
 		const auto& ownState = InputManager::Instance().readState.GetDeviceStates<ChildClass>();
@@ -28,28 +40,23 @@ namespace Krakenplay
 	{
 		return (static_cast<uint8_t>(state.buttonState) & static_cast<uint8_t>(button)) > 0;
 	}
-	inline bool InputManager::MouseState::WasButtonPressed(MouseButton button) const
+	
+	inline bool InputManager::KeyboardState::IsButtonDown(KeyboardKey button) const
 	{
-		return IsButtonDown(button) && !GetCorrespondingOldState().IsButtonDown(button);
-	}
-	inline bool InputManager::MouseState::WasButtonReleased(MouseButton button) const
-	{
-		return !IsButtonDown(button) && GetCorrespondingOldState().IsButtonDown(button);
+		return state.pressedKeys[0] == button ||
+			state.pressedKeys[1] == button || 
+			state.pressedKeys[2] == button || 
+			state.pressedKeys[3] == button || 
+			state.pressedKeys[4] == button || 
+			state.pressedKeys[5] == button || 
+			state.pressedKeys[6] == button ||
+			state.pressedKeys[7] == button;
 	}
 
 	inline bool InputManager::GamepadState::IsButtonDown(GamepadButton button) const
 	{
 		return (static_cast<uint16_t>(state.buttons) & static_cast<uint16_t>(button)) > 0;
 	}
-	inline bool InputManager::GamepadState::WasButtonPressed(GamepadButton button) const
-	{
-		return IsButtonDown(button) && !GetCorrespondingOldState().IsButtonDown(button);
-	}
-	inline bool InputManager::GamepadState::WasButtonReleased(GamepadButton button) const
-	{
-		return !IsButtonDown(button) && GetCorrespondingOldState().IsButtonDown(button);
-	}
-
 
 	template<typename StateType>
 	const StateType* InputManager::GetState(unsigned int globalDeviceID) const
@@ -78,6 +85,16 @@ namespace Krakenplay
 	inline unsigned int InputManager::GetNumConnectedMouses() const
 	{
 		return readState.numConnectedMouses;
+	}
+
+	inline unsigned int InputManager::GetNumKeyboards() const
+	{
+		return readState.keyboardStates.size();
+	}
+
+	inline unsigned int InputManager::GetNumConnectedKeyboards() const
+	{
+		return readState.numConnectedKeyboards;
 	}
 
 	inline unsigned int InputManager::GetNumGamepads() const
@@ -131,6 +148,17 @@ namespace Krakenplay
 		return mouseStates;
 	}
 
+	template<>
+	inline const std::vector<InputManager::KeyboardState>& InputManager::InputState::GetDeviceStates<InputManager::KeyboardState>() const
+	{
+		return keyboardStates;
+	}
+
+	template<>
+	inline std::vector<InputManager::KeyboardState>& InputManager::InputState::GetDeviceStates<InputManager::KeyboardState>()
+	{
+		return keyboardStates;
+	}
 
 	template<>
 	inline const std::vector<InputManager::GamepadState>& InputManager::InputState::GetDeviceStates<InputManager::GamepadState>() const

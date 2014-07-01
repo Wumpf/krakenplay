@@ -62,6 +62,7 @@ namespace Krakenplay
 
 		// Check device connection timeouts.
 		HandleConnectionTimeouts(writeState.mouseStates, writeState.numConnectedMouses, deviceConnectionTimeout);
+		HandleConnectionTimeouts(writeState.keyboardStates, writeState.numConnectedKeyboards, deviceConnectionTimeout);
 		HandleConnectionTimeouts(writeState.gamepadStates, writeState.numConnectedGamepads, deviceConnectionTimeout);
 
 		// Copy write state to read state.
@@ -71,6 +72,7 @@ namespace Krakenplay
 
 		// For state that switched from disconnected to connected, reset state to current state to avoid wrong state changes.
 		HandleNewConnects(readState.mouseStates, oldReadState.mouseStates);
+		HandleNewConnects(readState.keyboardStates, oldReadState.keyboardStates);
 		HandleNewConnects(readState.gamepadStates, oldReadState.gamepadStates);
 	}
 
@@ -95,6 +97,23 @@ namespace Krakenplay
 		case MessageChunkType::MOUSE_DISCONNECT:
 		{
 			MouseState& infoSlot = writeState.GetInfoSlot<MouseState>(clientID, header.deviceIndex);
+			infoSlot.connected = false;
+			infoSlot.lastUpdate = Time::Now();
+			break;
+		}
+
+		case MessageChunkType::KEYBOARD_STATUS:
+		{
+			KeyboardState& infoSlot = writeState.GetInfoSlot<KeyboardState>(clientID, header.deviceIndex);
+			infoSlot.connected = true;
+			infoSlot.lastUpdate = Time::Now();
+			memcpy(&infoSlot.state, messageBody, messageBodySize);
+			break;
+		}
+
+		case MessageChunkType::KEYBOARD_DISCONNECT:
+		{
+			KeyboardState& infoSlot = writeState.GetInfoSlot<KeyboardState>(clientID, header.deviceIndex);
 			infoSlot.connected = false;
 			infoSlot.lastUpdate = Time::Now();
 			break;

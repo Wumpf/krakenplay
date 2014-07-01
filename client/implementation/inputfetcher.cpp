@@ -1,5 +1,6 @@
 #include "../inputfetcher.h"
 #include "../mousefetcher.h"
+#include "../keyboardfetcher.h"
 #include "../gamepadfetcher.h"
 #include "../networkclient.h"
 
@@ -39,7 +40,7 @@ namespace Krakenplay
 		wc.lpszClassName = L"krakenplay";
 		if(!RegisterClass(&wc))
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 window class!");
-		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE, 0, 0, 100, 100, 0, 0, wc.hInstance, NULL);
+		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 100, 100, 0, 0, wc.hInstance, NULL);
 		if(hWnd == NULL)
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 Window Dialog!");
 
@@ -150,6 +151,16 @@ namespace Krakenplay
 
 	void InputFetcher::Update(NetworkClient& client)
 	{
+#ifdef OIS_WIN32_PLATFORM
+		// Need to keep window up to date.
+		MSG  msg;
+		while(PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+#endif
+
 		// Add new devices if there are any.
 		AddFreeDevices();
 
@@ -217,13 +228,18 @@ namespace Krakenplay
 					devices.push_back(new MouseFetcher(inputManager));
 					break;
 
+				case OIS::OISKeyboard:
+					std::cout << "Connected Keyboard. " << " Vendor: " << i->second << "\n";
+					devices.push_back(new KeyboardFetcher(inputManager));
+					break;
+
 				case OIS::OISJoyStick:
 					std::cout << "Connected Gamepad. " << " Vendor: " << i->second << "\n";
 					devices.push_back(new GamepadFetcher(inputManager));
 					break;
 
-				//default:
-				//	std::cout << "Unknown input device connected. " << " Vendor: " << i->second << "\n";
+				default:
+					std::cout << "Unknown input device connected. " << " Vendor: " << i->second << "\n";
 				}
 			}
 			catch (OIS::Exception e)
