@@ -31,7 +31,6 @@ Missing Features / TODOs
 ========
 In no specific order!
 
-* Clean device disconnect (via messages, not timeout)
 * More documentation on github frontpage
 * Interface refinement
 * Platform & compiler support
