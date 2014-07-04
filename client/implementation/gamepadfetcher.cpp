@@ -13,8 +13,6 @@ namespace Krakenplay
 		inputObject->setEventCallback(this);
 
 		memset(&currentState, 0, sizeof(currentState));
-		stateMessageHeader.messageType = MessageChunkType::GAMEPAD_STATUS;
-		stateMessageHeader.deviceIndex = inputObject->getID();
 
 		std::string vendor = inputObject->vendor();
 		std::transform(vendor.begin(), vendor.end(), vendor.begin(), ::tolower);
@@ -105,6 +103,22 @@ namespace Krakenplay
 		}
 		
 		return requestImmediateUpdate;
+	}
+
+	MessageChunkHeader GamepadFetcher::GetStateMessageHeader() const
+	{
+		MessageChunkHeader chunkHeader;
+		chunkHeader.messageType = MessageChunkType::GAMEPAD_STATUS;
+		chunkHeader.deviceIndex = inputObject->getID();
+		return chunkHeader;
+	}
+
+	MessageChunkHeader GamepadFetcher::GetDisconnectMessageHeader() const
+	{
+		MessageChunkHeader chunkHeader;
+		chunkHeader.messageType = MessageChunkType::GAMEPAD_DISCONNECT;
+		chunkHeader.deviceIndex = inputObject->getID();
+		return chunkHeader;
 	}
 
 	bool GamepadFetcher::buttonPressed(const OIS::JoyStickEvent &arg, int button)

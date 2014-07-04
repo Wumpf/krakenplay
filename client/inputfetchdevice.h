@@ -20,7 +20,10 @@ namespace Krakenplay
 		/// \see GetStateSize()
 		virtual const void* GetState(unsigned int& size) const = 0;
 
-		/// Returns a pointer to the corresponding message header to GetState.
-		virtual const MessageChunkHeader* GetStateMessageHeader() = 0;
+		/// Returns the corresponding message header to GetState.
+		virtual MessageChunkHeader GetStateMessageHeader() const = 0;
+
+		/// Returns the message for a disconnect message. This message consists only of a header.
+		virtual MessageChunkHeader GetDisconnectMessageHeader() const = 0;
 	};
 }

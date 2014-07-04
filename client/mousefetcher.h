@@ -23,8 +23,10 @@ namespace Krakenplay
 		{ size = sizeof(currentState); return &currentState; }
 
 		/// \copydoc InputFetchDevice::GetStateMessageHeader
-		virtual const MessageChunkHeader* GetStateMessageHeader() override
-		{ return &stateMessageHeader; }
+		virtual MessageChunkHeader GetStateMessageHeader() const override;
+
+		/// \copydoc InputFetchDevice::GetDisconnectMessageHeader
+		virtual MessageChunkHeader GetDisconnectMessageHeader() const override;
 
 		// OIS Callback functions:
 
@@ -41,7 +43,6 @@ namespace Krakenplay
 		OIS::InputManager* inputManager;
 		OIS::Mouse* inputObject;
 
-		MessageChunkHeader stateMessageHeader;
 		InternalMouseState currentState;
 	};
 }

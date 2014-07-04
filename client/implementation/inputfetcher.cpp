@@ -197,7 +197,7 @@ namespace Krakenplay
 			}
 
 			// Add message Header.
-			memcpy(&messageBuffer[messageBufferPos], fetcher->GetStateMessageHeader(), sizeof(Krakenplay::MessageChunkHeader));
+			memcpy(&messageBuffer[messageBufferPos], &fetcher->GetStateMessageHeader(), sizeof(Krakenplay::MessageChunkHeader));
 			messageBufferPos += sizeof(Krakenplay::MessageChunkHeader);
 
 			// Add status message itself.
@@ -211,6 +211,15 @@ namespace Krakenplay
 		// Restart stopwatch.
 		timeSinceLastUpdatePackage.StopAndReset();
 		timeSinceLastUpdatePackage.Resume();
+	}
+
+	void InputFetcher::Disconnect(NetworkClient& client)
+	{
+		// Send disconnect messages for each device.
+		for (auto fetcher : devices)
+		{
+			client.Send(reinterpret_cast<char*>(&fetcher->GetDisconnectMessageHeader()), sizeof(MessageChunkHeader));
+		}
 	}
 
 	void InputFetcher::AddFreeDevices()

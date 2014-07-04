@@ -25,6 +25,10 @@ namespace Krakenplay
 		/// Sends update messages of all input devices in a rate between Krakenplay::maxDurationBetweenMessage_seconds and Krakenplay::minDurationBetweenMessage_seconds.
 		void Update(NetworkClient& client);
 
+		/// Sends disconnect messages for all input devices.
+		void Disconnect(NetworkClient& client);
+
+
 	private:
 
 		/// Checks for free devices and adds them.

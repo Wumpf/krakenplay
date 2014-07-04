@@ -12,8 +12,6 @@ namespace Krakenplay
 		inputObject->setEventCallback(this);
 
 		memset(&currentState, 0, sizeof(currentState));
-		stateMessageHeader.messageType = MessageChunkType::KEYBOARD_STATUS;
-		stateMessageHeader.deviceIndex = inputObject->getID();
 	}
 
 	KeyboardFetcher::~KeyboardFetcher()
@@ -41,6 +39,22 @@ namespace Krakenplay
 		}
 
 		return requestImmediateUpdate;
+	}
+
+	MessageChunkHeader KeyboardFetcher::GetStateMessageHeader() const
+	{
+		MessageChunkHeader chunkHeader;
+		chunkHeader.messageType = MessageChunkType::KEYBOARD_STATUS;
+		chunkHeader.deviceIndex = inputObject->getID();
+		return chunkHeader;
+	}
+
+	MessageChunkHeader KeyboardFetcher::GetDisconnectMessageHeader() const
+	{
+		MessageChunkHeader chunkHeader;
+		chunkHeader.messageType = MessageChunkType::KEYBOARD_DISCONNECT;
+		chunkHeader.deviceIndex = inputObject->getID();
+		return chunkHeader;
 	}
 
 	bool KeyboardFetcher::keyPressed(const OIS::KeyEvent& arg)

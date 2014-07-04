@@ -12,8 +12,6 @@ namespace Krakenplay
 		inputObject->setEventCallback(this);
 
 		memset(&currentState, 0, sizeof(currentState));
-		stateMessageHeader.messageType = MessageChunkType::MOUSE_STATUS;
-		stateMessageHeader.deviceIndex = inputObject->getID();
 	}
 	
 	MouseFetcher::~MouseFetcher()
@@ -33,6 +31,22 @@ namespace Krakenplay
 		currentState.mouseWheel = static_cast<decltype(currentState.mouseWheel)>(inputObject->getMouseState().Z.abs);
 
 		return requestImmediateUpdate;
+	}
+
+	MessageChunkHeader MouseFetcher::GetStateMessageHeader() const
+	{
+		MessageChunkHeader chunkHeader;
+		chunkHeader.messageType = MessageChunkType::MOUSE_STATUS;
+		chunkHeader.deviceIndex = inputObject->getID();
+		return chunkHeader;
+	}
+
+	MessageChunkHeader MouseFetcher::GetDisconnectMessageHeader() const
+	{
+		MessageChunkHeader chunkHeader;
+		chunkHeader.messageType = MessageChunkType::MOUSE_DISCONNECT;
+		chunkHeader.deviceIndex = inputObject->getID();
+		return chunkHeader;
 	}
 
 	bool MouseFetcher::mouseMoved(const OIS::MouseEvent &arg)
