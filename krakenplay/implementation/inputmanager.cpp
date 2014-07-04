@@ -33,8 +33,6 @@ namespace Krakenplay
 
 			else if (newStateList[i].WasConnected())
 			{
-				assert(oldStateList[i].clientDeviceID == newStateList[i].clientDeviceID &&
-					oldStateList[i].clientID == newStateList[i].clientID && "Inconsistent IDs across new and old read state!");
 				oldStateList[i] = newStateList[i];
 				oldStateList[i].connected = false;
 			}
