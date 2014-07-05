@@ -24,7 +24,8 @@ Features
 Usage
 ========
 *a short explanation how to use the api in your own code will follow*
-*DO NOT USE KRAKENPLAY-CLIENTS IN PUBLIC NETWORKS* - an attacker intercept its packages to log your inputs.
+
+*DO NOT USE KRAKENPLAY-CLIENTS IN PUBLIC NETWORKS* - an attacker may intercept its packages to log your inputs.
 
 
 Missing Features / TODOs
@@ -34,7 +35,6 @@ In no specific order!
 * More documentation on github frontpage
 * Interface refinement
 * Platform & compiler support
-  * CMake scripts
   * Linux/GCC support
   * Mac/Clang support
 * Language ports
