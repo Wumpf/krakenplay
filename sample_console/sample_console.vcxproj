@@ -11,17 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\test_sfml\main.cpp" />
-    <ClCompile Include="..\test_sfml\player.cpp" />
+    <ClInclude Include="..\sample_sfml\player.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\test_sfml\player.h" />
+    <ClCompile Include="..\sample_sfml\main.cpp" />
+    <ClCompile Include="..\sample_sfml\player.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F56C29B3-17A4-464D-8C04-5F5507C7D710}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TestApplication</RootNamespace>
-    <ProjectName>test_sfml</ProjectName>
+    <ProjectName>sample_sfml</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

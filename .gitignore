@@ -29,10 +29,10 @@
 /krakenplay/Debug
 /client/Debug
 /client/Release
-/test_console/Debug
-/test_console/Release
-/test_sfml/Debug
-/test_sfml/Release
+/sample_console/Debug
+/sample_console/Release
+/sample_sfml/Debug
+/sample_sfml/Release
 /krakenplay/Release
 /*.opensdf
 /docs/html
