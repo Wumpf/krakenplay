@@ -10,9 +10,10 @@
 #include <sstream>
 #include <thread>
 
+#pragma warning(push, 0)
 #include <OISInputManager.h>
 #include <OISException.h>
-
+#pragma warning(pop)
 
 namespace Krakenplay
 {
@@ -32,15 +33,14 @@ namespace Krakenplay
 		OIS::ParamList pl;
 #if defined OIS_WIN32_PLATFORM
 		// Need to create a capture window for input grabbing.
-		MSG msg = { 0 };
 		WNDCLASS wc = { 0 };
 		wc.lpfnWndProc = &WndProc;
 		wc.hInstance = GetModuleHandle(nullptr);
 		wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
-		wc.lpszClassName = L"krakenplay";
+		wc.lpszClassName = "krakenplay";
 		if(!RegisterClass(&wc))
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 window class!");
-		HWND hWnd = CreateWindow(wc.lpszClassName, L"Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 100, 100, 0, 0, wc.hInstance, NULL);
+		HWND hWnd = CreateWindow(wc.lpszClassName, "Krakenplay Client", WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 100, 100, 0, 0, wc.hInstance, NULL);
 		if(hWnd == NULL)
 			OIS_EXCEPT(OIS::E_General, "Failed to create Win32 Window Dialog!");
 
@@ -189,7 +189,7 @@ namespace Krakenplay
 			const void* stateInfo = fetcher->GetState(stateInfoSize);
 
 			// Buffer full?
-			if (messageBufferPos + stateInfoSize + sizeof(Krakenplay::MessageChunkHeader) >= g_maxMessageSize)
+			if (messageBufferPos + stateInfoSize + sizeof(MessageChunkHeader) >= g_maxMessageSize)
 			{
 				// send message
 				client.Send(messageBuffer, messageBufferPos);
@@ -197,7 +197,8 @@ namespace Krakenplay
 			}
 
 			// Add message Header.
-			memcpy(&messageBuffer[messageBufferPos], &fetcher->GetStateMessageHeader(), sizeof(Krakenplay::MessageChunkHeader));
+			MessageChunkHeader header = fetcher->GetStateMessageHeader();
+			memcpy(&messageBuffer[messageBufferPos], &header, sizeof(MessageChunkHeader));
 			messageBufferPos += sizeof(Krakenplay::MessageChunkHeader);
 
 			// Add status message itself.
@@ -218,7 +219,8 @@ namespace Krakenplay
 		// Send disconnect messages for each device.
 		for (auto fetcher : devices)
 		{
-			client.Send(reinterpret_cast<char*>(&fetcher->GetDisconnectMessageHeader()), sizeof(MessageChunkHeader));
+			MessageChunkHeader header = fetcher->GetDisconnectMessageHeader();
+			client.Send(reinterpret_cast<char*>(&header), sizeof(MessageChunkHeader));
 		}
 	}
 

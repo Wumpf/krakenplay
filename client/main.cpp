@@ -5,7 +5,9 @@
 #include "networkclient.h"
 #include "inputfetcher.h"
 
+#pragma warning(push, 0)
 #include <OISException.h>
+#pragma warning(pop)
 
 std::unique_ptr<Krakenplay::InputFetcher> inputFetcher;
 std::unique_ptr<Krakenplay::NetworkClient> client;
@@ -20,7 +22,7 @@ static void shutdown(int signum)
 	_exit(1);
 }
 
-#if defined(_WIN32) && defined(_CONSOLE)
+#if defined(_WIN32)
 #include "Windows.h"
 
 BOOL WINAPI ConsoleHandler(DWORD CEvent)

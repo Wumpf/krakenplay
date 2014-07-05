@@ -1,5 +1,9 @@
 #include "../mousefetcher.h"
+
+#pragma warning(push, 0)
 #include <OISInputManager.h>
+#pragma warning(pop)
+
 #include <cassert>
 #include <iostream>
 
@@ -37,7 +41,7 @@ namespace Krakenplay
 	{
 		MessageChunkHeader chunkHeader;
 		chunkHeader.messageType = MessageChunkType::MOUSE_STATUS;
-		chunkHeader.deviceIndex = inputObject->getID();
+		chunkHeader.deviceIndex = static_cast<uint8_t>(inputObject->getID());
 		return chunkHeader;
 	}
 
@@ -45,23 +49,23 @@ namespace Krakenplay
 	{
 		MessageChunkHeader chunkHeader;
 		chunkHeader.messageType = MessageChunkType::MOUSE_DISCONNECT;
-		chunkHeader.deviceIndex = inputObject->getID();
+		chunkHeader.deviceIndex = static_cast<uint8_t>(inputObject->getID());
 		return chunkHeader;
 	}
 
-	bool MouseFetcher::mouseMoved(const OIS::MouseEvent &arg)
+	bool MouseFetcher::mouseMoved(const OIS::MouseEvent&)
 	{
 		requestImmediateUpdate = true;
 		return true;
 	}
 
-	bool MouseFetcher::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
+	bool MouseFetcher::mousePressed(const OIS::MouseEvent&, OIS::MouseButtonID)
 	{
 		requestImmediateUpdate = true;
 		return true;
 	}
 
-	bool MouseFetcher::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
+	bool MouseFetcher::mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID)
 	{
 		requestImmediateUpdate = true;
 		return true;

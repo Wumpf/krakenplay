@@ -99,7 +99,8 @@ namespace Krakenplay
 				knownClients.push_back(ipString);
 				clientIter = knownClients.end() - 1;
 			}
-			unsigned int clientIndex = clientIter - knownClients.begin();
+			size_t clientIndex = clientIter - knownClients.begin();
+			assert(clientIndex > std::numeric_limits<uint16_t>::max() && "Number of clients higher than storable within an uint16_t!");
 
 			// Resolve endianess.
 			ConvertEndiannessNetworkToHost(messageBuffer, recvLen);
@@ -114,7 +115,7 @@ namespace Krakenplay
 				unsigned int messageBodySize = GetMessageBodySize(header->messageType);
 
 				// Pass to input manager.
-				InputManager::Instance().ReceiveInput(*header, &messageBuffer[readPos], messageBodySize, clientIndex);
+				InputManager::Instance().ReceiveInput(*header, &messageBuffer[readPos], messageBodySize, static_cast<uint16_t>(clientIndex));
 				readPos += messageBodySize;
 			}
 			assert(readPos == recvLen && "Received message was smaller than expected!");

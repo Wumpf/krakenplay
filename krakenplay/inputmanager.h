@@ -113,34 +113,34 @@ namespace Krakenplay
 		/// \brief Returns the number of known mouse devices.
 		///
 		/// May contain also disconnected devices.
-		unsigned int GetNumMouses() const;
+		size_t GetNumMouses() const;
 
 		/// \brief Returns the number of connected mouse devices.
 		///
 		/// There may be disconnected devices residing in the list as well.
-		unsigned int GetNumConnectedMouses() const;
+		size_t GetNumConnectedMouses() const;
 
 
 		/// \brief Returns the number of known gamepad devices.
 		///
 		/// May contain also disconnected devices.
-		unsigned int GetNumKeyboards() const;
+		size_t GetNumKeyboards() const;
 
 		/// \brief Returns the number of connected gamepad devices.
 		///
 		/// There may be disconnected devices residing in the list as well.
-		unsigned int GetNumConnectedKeyboards() const;
+		size_t GetNumConnectedKeyboards() const;
 
 
 		/// \brief Returns the number of known gamepad devices.
 		///
 		/// May contain also disconnected devices.
-		unsigned int GetNumGamepads() const;
+		size_t GetNumGamepads() const;
 
 		/// \brief Returns the number of connected gamepad devices.
 		///
 		/// There may be disconnected devices residing in the list as well.
-		unsigned int GetNumConnectedGamepads() const;
+		size_t GetNumConnectedGamepads() const;
 
 
 		/// \brief Sets after which time without update a device is considered disconnected.
@@ -152,7 +152,7 @@ namespace Krakenplay
 		/// \brief Receives an input message. This method is thread-safe.
 		///
 		/// Krakenplay::NetworkServer uses this method in its receive thread.
-		void ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, unsigned int clientID);
+		void ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, uint16_t clientID);
 
 	private:
 		InputManager();

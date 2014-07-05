@@ -1,5 +1,9 @@
 #include "../gamepadfetcher.h"
+
+#pragma warning(push, 0)
 #include <OISInputManager.h>
+#pragma warning(pop)
+
 #include <cassert>
 #include <iostream>
 #include <algorithm>
@@ -64,31 +68,31 @@ namespace Krakenplay
 
 		// Left analog.
 		if (numAxis > 0)
-			currentState.thumbLX = inputObject->getJoyStickState().mAxes[1].abs;
+			currentState.thumbLX = static_cast<uint16_t>(inputObject->getJoyStickState().mAxes[1].abs);
 		else
 			currentState.thumbLX = 0;
 		if (numAxis > 1)
-			currentState.thumbLY = inputObject->getJoyStickState().mAxes[0].abs;
+			currentState.thumbLY = static_cast<uint16_t>(inputObject->getJoyStickState().mAxes[0].abs);
 		else
 			currentState.thumbLY = 0;
 
 		// Right analog.
 		if (numAxis > 2)
-			currentState.thumbRX = inputObject->getJoyStickState().mAxes[3].abs;
+			currentState.thumbRX = static_cast<uint16_t>(inputObject->getJoyStickState().mAxes[3].abs);
 		else
 			currentState.thumbRX = 0;
 		if (numAxis > 3)
-			currentState.thumbRY = inputObject->getJoyStickState().mAxes[2].abs;
+			currentState.thumbRY = static_cast<uint16_t>(inputObject->getJoyStickState().mAxes[2].abs);
 		else
 			currentState.thumbRY = 0;
 
 		// Trigger
 		if (numAxis > 4)
-			currentState.leftTrigger = inputObject->getJoyStickState().mAxes[4].abs / 129;
+			currentState.leftTrigger = static_cast<uint8_t>(inputObject->getJoyStickState().mAxes[4].abs / 129);
 		else
 			currentState.leftTrigger = 0;
 		if (numAxis > 4)
-			currentState.rightTrigger = inputObject->getJoyStickState().mAxes[5].abs / 129;
+			currentState.rightTrigger = static_cast<uint8_t>(inputObject->getJoyStickState().mAxes[5].abs / 129);
 		else
 			currentState.rightTrigger = 0;
 
@@ -109,7 +113,7 @@ namespace Krakenplay
 	{
 		MessageChunkHeader chunkHeader;
 		chunkHeader.messageType = MessageChunkType::GAMEPAD_STATUS;
-		chunkHeader.deviceIndex = inputObject->getID();
+		chunkHeader.deviceIndex = static_cast<uint8_t>(inputObject->getID());
 		return chunkHeader;
 	}
 
@@ -117,23 +121,23 @@ namespace Krakenplay
 	{
 		MessageChunkHeader chunkHeader;
 		chunkHeader.messageType = MessageChunkType::GAMEPAD_DISCONNECT;
-		chunkHeader.deviceIndex = inputObject->getID();
+		chunkHeader.deviceIndex = static_cast<uint8_t>(inputObject->getID());
 		return chunkHeader;
 	}
 
-	bool GamepadFetcher::buttonPressed(const OIS::JoyStickEvent &arg, int button)
+	bool GamepadFetcher::buttonPressed(const OIS::JoyStickEvent&, int)
 	{
 		requestImmediateUpdate = true;
 		return true;
 	}
 
-	bool GamepadFetcher::buttonReleased(const OIS::JoyStickEvent &arg, int button)
+	bool GamepadFetcher::buttonReleased(const OIS::JoyStickEvent&, int)
 	{
 		requestImmediateUpdate = true;
 		return true;
 	}
 
-	bool GamepadFetcher::axisMoved(const OIS::JoyStickEvent &arg, int axis)
+	bool GamepadFetcher::axisMoved(const OIS::JoyStickEvent&, int)
 	{
 		requestImmediateUpdate = true;
 		return true;

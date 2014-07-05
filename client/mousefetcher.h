@@ -1,6 +1,9 @@
 #pragma once
 
+#pragma warning(push, 0)
 #include <OISMouse.h>
+#pragma warning(pop)
+
 #include "inputfetchdevice.h"
 #include "../krakenplay/messages.h"
 

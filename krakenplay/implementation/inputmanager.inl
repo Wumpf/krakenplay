@@ -77,32 +77,32 @@ namespace Krakenplay
 		return nullptr;
 	}
 
-	inline unsigned int InputManager::GetNumMouses() const
+	inline size_t InputManager::GetNumMouses() const
 	{
 		return readState.mouseStates.size();
 	}
 
-	inline unsigned int InputManager::GetNumConnectedMouses() const
+	inline size_t InputManager::GetNumConnectedMouses() const
 	{
 		return readState.numConnectedMouses;
 	}
 
-	inline unsigned int InputManager::GetNumKeyboards() const
+	inline size_t InputManager::GetNumKeyboards() const
 	{
 		return readState.keyboardStates.size();
 	}
 
-	inline unsigned int InputManager::GetNumConnectedKeyboards() const
+	inline size_t InputManager::GetNumConnectedKeyboards() const
 	{
 		return readState.numConnectedKeyboards;
 	}
 
-	inline unsigned int InputManager::GetNumGamepads() const
+	inline size_t InputManager::GetNumGamepads() const
 	{
 		return readState.gamepadStates.size();
 	}
 
-	inline unsigned int InputManager::GetNumConnectedGamepads() const
+	inline size_t InputManager::GetNumConnectedGamepads() const
 	{
 		return readState.numConnectedGamepads;
 	}

@@ -1,5 +1,9 @@
 #include "../Keyboardfetcher.h"
+
+#pragma warning(push, 0)
 #include <OISInputManager.h>
+#pragma warning(pop)
+
 #include <cassert>
 #include <iostream>
 
@@ -45,7 +49,7 @@ namespace Krakenplay
 	{
 		MessageChunkHeader chunkHeader;
 		chunkHeader.messageType = MessageChunkType::KEYBOARD_STATUS;
-		chunkHeader.deviceIndex = inputObject->getID();
+		chunkHeader.deviceIndex = static_cast<uint8_t>(inputObject->getID());
 		return chunkHeader;
 	}
 
@@ -53,17 +57,17 @@ namespace Krakenplay
 	{
 		MessageChunkHeader chunkHeader;
 		chunkHeader.messageType = MessageChunkType::KEYBOARD_DISCONNECT;
-		chunkHeader.deviceIndex = inputObject->getID();
+		chunkHeader.deviceIndex = static_cast<uint8_t>(inputObject->getID());
 		return chunkHeader;
 	}
 
-	bool KeyboardFetcher::keyPressed(const OIS::KeyEvent& arg)
+	bool KeyboardFetcher::keyPressed(const OIS::KeyEvent&)
 	{
 		requestImmediateUpdate = true;
 		return true;
 	}
 
-	bool KeyboardFetcher::keyReleased(const OIS::KeyEvent& arg)
+	bool KeyboardFetcher::keyReleased(const OIS::KeyEvent&)
 	{
 		requestImmediateUpdate = true;
 		return true;
