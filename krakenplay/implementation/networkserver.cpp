@@ -100,7 +100,7 @@ namespace Krakenplay
 				clientIter = knownClients.end() - 1;
 			}
 			size_t clientIndex = clientIter - knownClients.begin();
-			assert(clientIndex > std::numeric_limits<uint16_t>::max() && "Number of clients higher than storable within an uint16_t!");
+			assert(clientIndex < std::numeric_limits<uint16_t>::max() && "Number of clients higher than storable within an uint16_t!");
 
 			// Resolve endianess.
 			ConvertEndiannessNetworkToHost(messageBuffer, recvLen);
