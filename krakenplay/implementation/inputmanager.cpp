@@ -40,7 +40,7 @@ namespace Krakenplay
 	}
 
 	template<typename StateList>
-	void HandleConnectionTimeouts(StateList& writeState, unsigned int& connectionCounter, Time deviceConnectionTimeout)
+	void HandleConnectionTimeouts(StateList& writeState, size_t& connectionCounter, Time deviceConnectionTimeout)
 	{
 		Time now = Time::Now();
 		connectionCounter = 0;
@@ -59,9 +59,9 @@ namespace Krakenplay
 		inputWriteMutex.lock();
 
 		// Check device connection timeouts.
-		HandleConnectionTimeouts(writeState.mouseStates, writeState.numConnectedMouses, deviceConnectionTimeout);
-		HandleConnectionTimeouts(writeState.keyboardStates, writeState.numConnectedKeyboards, deviceConnectionTimeout);
-		HandleConnectionTimeouts(writeState.gamepadStates, writeState.numConnectedGamepads, deviceConnectionTimeout);
+		HandleConnectionTimeouts(writeState.GetStateCollection<MouseState>().states, writeState.GetStateCollection<MouseState>().numConnected, deviceConnectionTimeout);
+		HandleConnectionTimeouts(writeState.GetStateCollection<KeyboardState>().states, writeState.GetStateCollection<KeyboardState>().numConnected, deviceConnectionTimeout);
+		HandleConnectionTimeouts(writeState.GetStateCollection<GamepadState>().states, writeState.GetStateCollection<GamepadState>().numConnected, deviceConnectionTimeout);
 
 		// Copy write state to read state.
 		readState = writeState;
@@ -69,9 +69,9 @@ namespace Krakenplay
 		inputWriteMutex.unlock();
 
 		// For state that switched from disconnected to connected, reset state to current state to avoid wrong state changes.
-		HandleNewConnects(readState.mouseStates, oldReadState.mouseStates);
-		HandleNewConnects(readState.keyboardStates, oldReadState.keyboardStates);
-		HandleNewConnects(readState.gamepadStates, oldReadState.gamepadStates);
+		HandleNewConnects(readState.GetStateCollection<MouseState>().states, oldReadState.GetStateCollection<MouseState>().states);
+		HandleNewConnects(readState.GetStateCollection<GamepadState>().states, oldReadState.GetStateCollection<GamepadState>().states);
+		HandleNewConnects(readState.GetStateCollection<KeyboardState>().states, oldReadState.GetStateCollection<KeyboardState>().states);
 	}
 
 	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, uint16_t clientID)

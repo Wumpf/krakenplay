@@ -39,7 +39,7 @@ int main()
 		// Mouse.
 		for (unsigned int mouseIdx = 0; mouseIdx < InputManager::Instance().GetNumMouses(); ++mouseIdx)
 		{
-			auto mouseState = InputManager::Instance().GetState<InputManager::MouseState>(mouseIdx);
+			auto mouseState = InputManager::Instance().GetStateMouse(mouseIdx);
 			if(mouseState->WasConnected())
 				std::cout << GetDeviceIdentifyString(*mouseState) << "Mouse connected!\n";
 			if(mouseState->WasDisconnected())
@@ -60,7 +60,7 @@ int main()
 		// Keyboard
 		for(unsigned int keyboardIdx = 0; keyboardIdx < InputManager::Instance().GetNumKeyboards(); ++keyboardIdx)
 		{
-			auto keyboardState = InputManager::Instance().GetState<InputManager::KeyboardState>(keyboardIdx);
+			auto keyboardState = InputManager::Instance().GetStateKeyboard(keyboardIdx);
 			if(keyboardState->WasConnected())
 				std::cout << GetDeviceIdentifyString(*keyboardState) << "Keyboard connected!\n";
 			if(keyboardState->WasDisconnected())
@@ -80,7 +80,7 @@ int main()
 		// Gamepad
 		for (unsigned int gamepadIdx = 0; gamepadIdx < InputManager::Instance().GetNumGamepads(); ++gamepadIdx)
 		{
-			auto gamepadState = InputManager::Instance().GetState<InputManager::GamepadState>(gamepadIdx);
+			auto gamepadState = InputManager::Instance().GetStateGamepad(gamepadIdx);
 			if (gamepadState->WasConnected())
 				std::cout << GetDeviceIdentifyString(*gamepadState) << "Gamepad connected!\n";
 			if (gamepadState->WasDisconnected())

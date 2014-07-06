@@ -23,7 +23,7 @@ namespace Krakenplay
 		/// All WasPressed/Released methods rely on this call. This method locks the internal write state that can be accessed in parallel.
 		/// You should call this method frequently.
 		void Update();
-		
+
 		/// \brief Device info, contained in all concrete device infos.
 		template<typename ChildClass, typename ButtonType>
 		class DeviceState
@@ -40,13 +40,13 @@ namespace Krakenplay
 
 			/// Checks if the given button/key changed from down to not-down in the last update.
 			bool WasButtonReleased(ButtonType button) const;
-		
+
 			/// Timestamp of the last received update.
 			Time lastUpdate;
 
 			/// Index of the client computer this device belongs to.
 			uint16_t clientID;
-			
+
 			/// Local index of this device on the client machine.
 			uint8_t clientDeviceID;
 
@@ -94,9 +94,13 @@ namespace Krakenplay
 		};
 
 
+		/// \name Template based state access.
+		/// State access using child classes of DeviceState as parameter.
+		/// \{
+
 		/// \brief Returns the current device state of a given type by providing a global device ID.
 		///
-		/// If there is no mouse state with the given ID, nullptr will be returned. 
+		/// If there is no state with the given ID, nullptr will be returned. 
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
 		/// \attention Be careful if you store a pointer/references to this state, since after an InputManager::Update call it may be relocated!
 		template<typename StateType>
@@ -104,43 +108,61 @@ namespace Krakenplay
 
 		/// \brief Returns the current device state of a given type by providing a client ID and a client device ID.
 		///
-		/// If there is no mouse state with the given IDs, nullptr will be returned. 
+		/// If there is no state with the given IDs, nullptr will be returned. 
 		/// If the queried device is disconnected, its last state will be returned (see DeviceInfo::connected).
 		/// \attention Be careful if you store a pointer/references to this state, since after an InputManager::Update call it may be relocated!
 		template<typename StateType>
 		const StateType* GetState(uint16_t clientID, uint8_t clientDeviceID) const;
 
-		/// \brief Returns the number of known mouse devices.
+		/// \brief Returns the number of known devices of a given state type.
 		///
 		/// May contain also disconnected devices.
-		size_t GetNumMouses() const;
+		/// \see GetNumConnectedDevices
+		template<typename StateType>
+		size_t GetNumDevices() const;
 
-		/// \brief Returns the number of connected mouse devices.
+		/// \brief Returns the number of connected devices for a given type.
 		///
 		/// There may be disconnected devices residing in the list as well.
+		/// \see GetNumDevices
+		template<typename StateType>
+		size_t GetNumConnectedDevices() const;
+
+		/// \}
+
+
+		/// \name Explicit state access.
+		/// Wrapper of the template access functions.
+		/// \{
+
+		/// \see GetState
+		const MouseState* GetStateMouse(unsigned int globalDeviceID) const;
+		/// \see GetState
+		const MouseState* GetStateMouse(uint16_t clientID, uint8_t clientDeviceID) const;
+		/// \see GetNumDevices
+		size_t GetNumMouses() const;
+		/// \see GetNumConnectedDevices
 		size_t GetNumConnectedMouses() const;
 
-
-		/// \brief Returns the number of known gamepad devices.
-		///
-		/// May contain also disconnected devices.
+		/// \see GetState
+		const KeyboardState* GetStateKeyboard(unsigned int globalDeviceID) const;
+		/// \see GetState
+		const KeyboardState* GetStateKeyboard(uint16_t clientID, uint8_t clientDeviceID) const;
+		/// \see GetNumDevices
 		size_t GetNumKeyboards() const;
-
-		/// \brief Returns the number of connected gamepad devices.
-		///
-		/// There may be disconnected devices residing in the list as well.
+		/// \see GetNumConnectedDevices
 		size_t GetNumConnectedKeyboards() const;
 
-
-		/// \brief Returns the number of known gamepad devices.
-		///
-		/// May contain also disconnected devices.
+		/// \see GetState
+		const GamepadState* GetStateGamepad(unsigned int globalDeviceID) const;
+		/// \see GetState
+		const GamepadState* GetStateGamepad(uint16_t clientID, uint8_t clientDeviceID) const;
+		/// \see GetNumDevices
 		size_t GetNumGamepads() const;
-
-		/// \brief Returns the number of connected gamepad devices.
-		///
-		/// There may be disconnected devices residing in the list as well.
+		/// \see GetNumConnectedDevices
 		size_t GetNumConnectedGamepads() const;
+
+		/// \}
 
 
 		/// \brief Sets after which time without update a device is considered disconnected.
@@ -160,42 +182,37 @@ namespace Krakenplay
 
 		friend class MouseState;
 
-		/// Assembly of all input states that need to be double buffered.
-		struct InputState
+		/// Collection of device states of a certain type.
+		template<typename StateType>
+		struct DeviceStateCollection
 		{
-			InputState() : numConnectedMouses(0), numConnectedKeyboards(0), numConnectedGamepads(0) {}
+			DeviceStateCollection() : numConnected(0) {}
 
-			std::vector<MouseState> mouseStates;
-			unsigned int numConnectedMouses;
+			std::vector<StateType> states;
+			size_t numConnected;
+		};
 
-			std::vector<KeyboardState> keyboardStates;
-			unsigned int numConnectedKeyboards;
-
-			std::vector<GamepadState> gamepadStates;
-			unsigned int numConnectedGamepads;
-
+		/// Assembly of all input states that need to be double buffered.
+		///
+		/// Inheriting from DeviceStateCollection collections allows to access states via template parameters.
+		/// For a similar example see http://stackoverflow.com/questions/5904680/can-i-gain-access-to-a-component-by-type
+		struct InputState : public DeviceStateCollection<MouseState>, DeviceStateCollection<KeyboardState>, DeviceStateCollection<GamepadState>
+		{
 			/// Retrieves either the mouse info with the given indices or returns a new/reused slot.
 			/// For the latter the indices will registered onto the given device slot. Connection state and last update will *not* be changed.
-			template<typename DeviceType>
-			DeviceType& GetInfoSlot(uint16_t clientID, uint8_t clientDeviceIndex);
+			template<typename StateType>
+			StateType& GetInfoSlot(uint16_t clientID, uint8_t clientDeviceIndex);
 
-			/// Gets device state list of a given type.
-			template<typename DeviceType>
-			const std::vector<DeviceType>& GetDeviceStates() const;
-			template<typename DeviceType>
-			std::vector<DeviceType>& GetDeviceStates();
-
-			/// Gets mouse device states.
-			template<> const std::vector<Krakenplay::InputManager::MouseState>& GetDeviceStates<Krakenplay::InputManager::MouseState>() const;
-			template<> std::vector<MouseState>& GetDeviceStates<MouseState>();
-
-			/// Gets keyboard device states.
-			template<> const std::vector<Krakenplay::InputManager::KeyboardState>& GetDeviceStates<Krakenplay::InputManager::KeyboardState>() const;
-			template<> std::vector<KeyboardState>& GetDeviceStates<KeyboardState>();
-
-			/// Gets gamepad device states.
-			template<> const std::vector<Krakenplay::InputManager::GamepadState>& GetDeviceStates<Krakenplay::InputManager::GamepadState>() const;
-			template<> std::vector<GamepadState>& GetDeviceStates<GamepadState>();
+			/// \brief Returns state collection reference for given state type.
+			///
+			/// Performs static_cast on this pointer.
+			template<typename StateType>
+			DeviceStateCollection<StateType>& GetStateCollection();
+			/// \brief Returns state collection reference for given state type.
+			///
+			/// Performs static_cast on this pointer.
+			template<typename StateType>
+			const DeviceStateCollection<StateType>& GetStateCollection() const;
 		};
 
 		InputState readState;		///< State from which is currently read.

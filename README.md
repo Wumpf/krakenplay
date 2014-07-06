@@ -33,7 +33,6 @@ Missing Features / TODOs
 In no specific order!
 
 * More documentation on github frontpage
-* Interface refinement
 * Platform & compiler support
   * Linux/GCC support
   * Mac/Clang support
