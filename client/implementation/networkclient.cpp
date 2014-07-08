@@ -4,8 +4,8 @@
 namespace Krakenplay
 {
 	NetworkClient::NetworkClient() :
-		initialized(false),
-		messagePort(0)
+        messagePort(0),
+        initialized(false)
 	{
 		// Server address to default
 		SetServerAddress();

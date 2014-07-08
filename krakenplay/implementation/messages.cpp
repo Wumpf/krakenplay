@@ -233,11 +233,12 @@ namespace Krakenplay
 
 	template<> void ConvertEndianess<true, float>(float& data)
 	{
-		*reinterpret_cast<unsigned int*>(&data) = htonf(data);
+        *reinterpret_cast<unsigned int*>(&data) = htonl(*reinterpret_cast<unsigned int*>(&data)); // Should work on all known platforms. htohf exists only in Windows 8.
 	}
 	template<> void ConvertEndianess<false, float>(float& data)
 	{
-		data = ntohf(*reinterpret_cast<unsigned int*>(&data));
+        unsigned int convertedData = ntohl(*reinterpret_cast<unsigned int*>(&data)); // Should work on all known platforms. ntohf exists only in Windows 8.
+        data = *reinterpret_cast<float*>(&convertedData);
 	}
 
 	template<bool hostToNetwork>

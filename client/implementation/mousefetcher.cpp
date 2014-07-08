@@ -5,6 +5,7 @@
 #pragma warning(pop)
 
 #include <cassert>
+#include <cstring>
 #include <iostream>
 
 namespace Krakenplay

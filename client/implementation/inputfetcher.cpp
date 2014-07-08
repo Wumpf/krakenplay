@@ -33,7 +33,8 @@ namespace Krakenplay
 		OIS::ParamList pl;
 #if defined OIS_WIN32_PLATFORM
 		// Need to create a capture window for input grabbing.
-		WNDCLASS wc = { 0 };
+        WNDCLASS wc;
+        memset(&wc, 0, sizeof(wc));
 		wc.lpfnWndProc = &WndProc;
 		wc.hInstance = GetModuleHandle(nullptr);
 		wc.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);

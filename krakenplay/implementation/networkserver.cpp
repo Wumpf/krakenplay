@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 
 namespace Krakenplay
 {
@@ -93,7 +94,7 @@ namespace Krakenplay
 
 			// Check if client is already known and add to list if not.
 			std::string ipString = inet_ntoa(socketadressHeader.sin_addr);
-			auto clientIter = std::find(knownClients.begin(), knownClients.end(), ipString);
+            auto clientIter = std::find(knownClients.begin(), knownClients.end(), ipString);
 			if (clientIter == knownClients.end())
 			{
 				knownClients.push_back(ipString);

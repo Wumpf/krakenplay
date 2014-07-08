@@ -76,7 +76,7 @@ namespace Krakenplay
 
 	void InputManager::ReceiveInput(const MessageChunkHeader& header, const void* messageBody, unsigned int messageBodySize, uint16_t clientID)
 	{
-		assert(messageBody != nullptr || (messageBody == nullptr && messageBodySize == 0) && "Invalid message body pointer!");
+        assert((messageBody != nullptr || (messageBody == nullptr && messageBodySize == 0)) && "Invalid message body pointer!");
 		assert(GetMessageBodySize(header.messageType) == messageBodySize && "Invalid message body size!");
 
 		inputWriteMutex.lock();

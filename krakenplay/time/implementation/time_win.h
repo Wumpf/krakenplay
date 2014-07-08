@@ -2,7 +2,7 @@
 
 namespace Krakenplay
 {
-	static LARGE_INTEGER g_qpcFrequency = { 0 };
+    static LARGE_INTEGER g_qpcFrequency;
 
 	void Time::Initialize()
 	{
