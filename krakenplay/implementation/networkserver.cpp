@@ -1,6 +1,6 @@
 #include "../networkserver.h"
 #include "../inputmanager.h"
-#include "../Time/Stopwatch.h"
+#include "../time/stopwatch.h"
 
 #include <iostream>
 #include <cassert>
@@ -20,43 +20,44 @@ namespace Krakenplay
 		this->messagePort = messagePort;
 		this->identifyPort = identifyPort;
 
+#ifdef _WIN32
 		// Initialize winsock - multiple initializations are not bad, infact there is reference counting mechanism
 		// http://stackoverflow.com/questions/1869689/is-it-possible-to-tell-if-wsastartup-has-been-called-in-a-process
 		WSADATA wsa;
 		if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		{
-			std::cerr << "Failed. Error Code: " << WSAGetLastError() << std::endl;
+			std::cerr << "Failed to start winsock: " << GetLastSocketErrorDescription() << std::endl;
 			return false;
 		}
+#endif
 
 		// Create broadcast socket
 		if ((broadcastSocket = socket(AF_INET, SOCK_DGRAM, AF_UNSPEC)) == INVALID_SOCKET)
 		{
-			std::cerr << "Could not create server-broadcast socket: " << WSAGetLastError() << std::endl;
+			std::cerr << "Could not create server-broadcast socket: " << GetLastSocketErrorDescription() << std::endl;
 		}
-		bool broadcastVal = true;
+		int broadcastVal = 1;
 		if (setsockopt(broadcastSocket, SOL_SOCKET, SO_BROADCAST, (char *)&broadcastVal, sizeof(broadcastVal)) == SOCKET_ERROR)
 		{
-			std::cerr << "Could not set server-broadcast to allow broadcasts (setsockopt). Error code: " << WSAGetLastError() << std::endl;
+			std::cerr << "Could not set server-broadcast to allow broadcasts (setsockopt): " << GetLastSocketErrorDescription() << std::endl;
 		}
-
 
 		// Create server socket.
 		if((serverSocket = socket(AF_INET, SOCK_DGRAM, AF_UNSPEC)) == INVALID_SOCKET)
 		{
-			std::cerr << "Could not create server-receive socket: " << WSAGetLastError() << std::endl;
+			std::cerr << "Could not create server-receive socket: " << GetLastSocketErrorDescription() << std::endl;
 		}
 
 		// Prepare the sockaddr_in structure.
 		sockaddr_in clientAddr;
 		clientAddr.sin_family = AF_INET;
-		clientAddr.sin_addr.s_addr = INADDR_ANY;
+		clientAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 		clientAddr.sin_port = htons(messagePort);
 
 		// Bind
 		if(bind(serverSocket, (struct sockaddr *)&clientAddr, sizeof(clientAddr)) == SOCKET_ERROR)
 		{
-			std::cerr << "Bind failed with error code: " << WSAGetLastError() << std::endl;
+			std::cerr << "Bind failed: " << GetLastSocketErrorDescription() << std::endl;
 			return false;
 		}
 
@@ -83,12 +84,12 @@ namespace Krakenplay
 		while(serverRunning)
 		{
 			// Receive data
-			int socketadressHeaderLen = sizeof(sockaddr_in);
-			int recvLen = 0;
+			socklen_t socketadressHeaderLen = sizeof(sockaddr_in);
+			ssize_t recvLen = 0;
 			if ((recvLen = recvfrom(serverSocket, messageBuffer, g_maxMessageSize, 0, reinterpret_cast<sockaddr*>(&socketadressHeader), &socketadressHeaderLen)) == SOCKET_ERROR)
 			{
 				if (serverRunning)
-					std::cerr << "recvfrom() failed with error code: " << WSAGetLastError() << std::endl;
+					std::cerr << "recvfrom() failed: " << GetLastSocketErrorDescription() << std::endl;
 				continue;
 			}
 
@@ -128,7 +129,7 @@ namespace Krakenplay
 		sockaddr_in clientAddr;
 		clientAddr.sin_family = AF_INET;
 		clientAddr.sin_port = htons(identifyPort);
-		clientAddr.sin_addr.s_addr = INADDR_BROADCAST;
+		clientAddr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 
 		MessageChunkHeader identifyMessage;
 		identifyMessage.messageType = MessageChunkType::SERVER_IDENTIFY;
@@ -144,7 +145,7 @@ namespace Krakenplay
 			if (sendto(broadcastSocket, reinterpret_cast<char*>(&identifyMessage), sizeof(identifyMessage), 0, reinterpret_cast<sockaddr*>(&clientAddr), sizeof(clientAddr)) == SOCKET_ERROR)
 			{
 				if (serverRunning && identifyMessageRateMS > 0)
-					std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
+					std::cerr << "sendto() failed with: " << GetLastSocketErrorDescription() << std::endl;
 				continue;
 			}
 
@@ -160,9 +161,13 @@ namespace Krakenplay
 		if(serverRunning)
 		{
 			serverRunning = false; 
+
 			closesocket(serverSocket);
 			closesocket(broadcastSocket);
+#ifdef _WIN32
 			WSACleanup();
+#endif
+
 			receiveThread.join();
 			identifyThread.join();
 		}

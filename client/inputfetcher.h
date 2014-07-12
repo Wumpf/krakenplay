@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "../krakenplay/Time/Stopwatch.h"
+#include "../krakenplay/time/stopwatch.h"
 #include "../krakenplay/messages.h"
 
 namespace OIS

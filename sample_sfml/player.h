@@ -5,6 +5,7 @@ class Player
 {
 public:
 	Player();
+	virtual ~Player() {}
 
 	virtual void Update() = 0;
 	virtual bool IsAlive() = 0;

@@ -10,6 +10,8 @@ addSourceDir("time/implementation" krakenplay_SRC)
 add_library(krakenplay STATIC ${krakenplay_SRC})
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	target_link_libraries(krakenplay Ws2_32.lib)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	target_link_libraries(krakenplay rt) # Needed for clock.
 endif()
 
 install(TARGETS krakenplay DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/../lib")

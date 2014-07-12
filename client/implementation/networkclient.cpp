@@ -15,19 +15,21 @@ namespace Krakenplay
 	{
 		DeInitClient();
 
+#ifdef _WIN32
 		// Initialize winsock - multiple initializations are not bad, infact there is reference counting mechanism
 		// http://stackoverflow.com/questions/1869689/is-it-possible-to-tell-if-wsastartup-has-been-called-in-a-process
 		WSADATA wsa;
 		if(WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		{
-			std::cerr << "Failed. Error Code: " << WSAGetLastError() << std::endl;
+			std::cerr << "Failed to start winsock: " << GetLastSocketErrorDescription() << std::endl;
 			return false;
 		}
+#endif
 
 		// Create server socket.
 		if((clientSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET)
 		{
-			std::cerr << "Could not create socket: " << WSAGetLastError() << std::endl;
+			std::cerr << "Could not create socket: " << GetLastSocketErrorDescription() << std::endl;
 		}
 
 		initialized = true;
@@ -40,7 +42,7 @@ namespace Krakenplay
 		this->messagePort = messagePort;
 		serverAddr.sin_family = AF_INET;
 		serverAddr.sin_port = htons(messagePort);
-		serverAddr.sin_addr.S_un.S_addr = inet_addr(ip);
+		serverAddr.sin_addr.s_addr = htonl(inet_addr(ip));
 	}
 
 	bool NetworkClient::WaitForServerIdentifyMessage(uint16_t messagePort, uint16_t identifyPort)
@@ -52,18 +54,18 @@ namespace Krakenplay
 		SOCKET identifySocket;
 		if ((identifySocket = socket(AF_INET, SOCK_DGRAM, AF_UNSPEC)) == INVALID_SOCKET)
 		{
-			std::cerr << "Could not create socket: " << WSAGetLastError() << std::endl;
+			std::cerr << "Could not create socket: " << GetLastSocketErrorDescription() << std::endl;
 			return false;
 		}
 
 		sockaddr_in anyAddr;
 		anyAddr.sin_family = AF_INET;
-		anyAddr.sin_addr.s_addr = INADDR_ANY;
 		anyAddr.sin_port = htons(identifyPort);
+		anyAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 		if (bind(identifySocket, (struct sockaddr *)&anyAddr, sizeof(anyAddr)) == SOCKET_ERROR)
 		{
-			std::cerr << "Bind failed with error code: " << WSAGetLastError() << std::endl;
+			std::cerr << "Bind failed: " << GetLastSocketErrorDescription() << std::endl;
 			closesocket(identifySocket);
 			return false;
 		}
@@ -71,17 +73,20 @@ namespace Krakenplay
 		for (;;)
 		{
 			// Receive data
-			int socketadressHeaderLen = sizeof(serverAddr);
-			int recvLen = 0;
+			socklen_t socketadressHeaderLen = sizeof(serverAddr);
+			ssize_t recvLen = 0;
 			if ((recvLen = recvfrom(identifySocket, reinterpret_cast<char*>(&messageBuffer), sizeof(messageBuffer), 0, reinterpret_cast<sockaddr*>(&serverAddr), &socketadressHeaderLen)) == SOCKET_ERROR)
 			{
-				int error = WSAGetLastError();
-
 				// Wrong message
+#ifdef _WIN32
+				int error = WSAGetLastError();
 				if (error == WSAEMSGSIZE)
 					continue;
-
-				std::cerr << "recvfrom() failed with error code: " << error << std::endl;
+#else
+				if (errno == EMSGSIZE)
+					continue;
+#endif
+				std::cerr << "recvfrom() failed: " << GetLastSocketErrorDescription() << std::endl;
 				continue;
 			}
 
@@ -109,7 +114,7 @@ namespace Krakenplay
 		ConvertEndiannessHostToNetwork(data, size);
 		if (sendto(clientSocket, data, size, 0, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == SOCKET_ERROR)
 		{
-			std::cerr << "sendto() failed with error code: " << WSAGetLastError() << std::endl;
+			std::cerr << "sendto() failed with error code: " << GetLastSocketErrorDescription() << std::endl;
 		}
 	}
 
@@ -118,7 +123,9 @@ namespace Krakenplay
 		if (initialized)
 		{
 			closesocket(clientSocket);
+#ifdef _WIN32
 			WSACleanup();
+#endif
 			initialized = false;
 		}
 	}

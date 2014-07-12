@@ -4,19 +4,18 @@
 #include "../gamepadfetcher.h"
 #include "../networkclient.h"
 
-#include "../../krakenplay/Time/time.h"
+#include "../../krakenplay/time/time.h"
 
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <cstring>
 
 #pragma warning(push, 0)
 #include <OISInputManager.h>
 #include <OISException.h>
 #pragma warning(pop)
 
-namespace Krakenplay
-{
 #if defined OIS_WIN32_PLATFORM
 #include <windows.h>
 
@@ -25,8 +24,18 @@ namespace Krakenplay
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 
+#elif defined OIS_LINUX_PLATFORM
+	#include <X11/Xlib.h>
+	#include <X11/Xatom.h>
+	void checkX11Events();
+
+#elif defined OIS_APPLE_PLATFORM
+	#include <Carbon/Carbon.h>
+	void checkMacEvents();
 #endif
 
+namespace Krakenplay
+{
 	InputFetcher::InputFetcher()
 	{
 		// Init OIS
@@ -59,10 +68,11 @@ namespace Krakenplay
 
 #elif defined OIS_LINUX_PLATFORM // NOT TESTED YET
 		//Connects to default X window
+		Display* xDisp;
 		if(!(xDisp = XOpenDisplay(0)))
-			OIS_EXCEPT(E_General, "Error opening X!");
+			OIS_EXCEPT(OIS::E_General, "Error opening X!");
 		//Create a window
-		xWin = XCreateSimpleWindow(xDisp, DefaultRootWindow(xDisp), 0, 0, 100, 100, 0, 0, 0);
+		Window xWin = XCreateSimpleWindow(xDisp, DefaultRootWindow(xDisp), 0, 0, 100, 100, 0, 0, 0);
 		//bind our connection to that window
 		XMapWindow(xDisp, xWin);
 		//Select what events we want to listen to locally

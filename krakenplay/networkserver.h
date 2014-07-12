@@ -3,8 +3,8 @@
 #include <vector>
 #include <cstdint>
 #include <thread>
-#include <winsock2.h>
 
+#include "socketabstraction.h"
 #include "messages.h"
 
 namespace Krakenplay

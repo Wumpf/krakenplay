@@ -27,6 +27,12 @@ Usage
 
 *DO NOT USE KRAKENPLAY-CLIENTS IN PUBLIC NETWORKS* - an attacker may intercept its packages to log your inputs.
 
+Tested Systems & Compilers
+========
+Since there are no automatic build tests (yet?), platform/compiler specific errors may occur from time to time.
+Bugfixes are very appreciated!
+* Visual Studio 2013 x64/x86 (vs120)
+* gcc 4.8 x64/x86
 
 Missing Features / TODOs
 ========
@@ -34,7 +40,6 @@ In no specific order!
 
 * More documentation on github frontpage
 * Platform & compiler support
-  * Linux/GCC support
   * Mac/Clang support
 * Language ports
   * C Interface

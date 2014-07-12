@@ -1,6 +1,6 @@
 #include "../messages.h"
+#include "../socketabstraction.h"
 #include <cassert>
-#include <WinSock2.h>
 #include <type_traits>
 
 namespace Krakenplay

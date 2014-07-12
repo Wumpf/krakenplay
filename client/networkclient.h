@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cinttypes>
-#include <WinSock2.h>
 #include <thread>
 
+#include "../krakenplay/socketabstraction.h"
 #include "../krakenplay/messages.h"
 
 namespace Krakenplay
